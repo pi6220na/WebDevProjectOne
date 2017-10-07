@@ -33,11 +33,12 @@
     <div class="view_port">
         <h1>Slitherin Slinky</h1>
         <button id="runButton">RUN GAME</button>
+        <p id="sLength"></p>
+        <p><span>Messages: </span><span id="collide"></span></p>
     </div>
 
     <div>
-        <p id="sLength"></p>
-        <p id="collide"></p>
+        <p></p>
     </div>
 
     <div class="view_port">
@@ -88,8 +89,10 @@
 
             var slinkerX = [];
             var slinkerY = [];
-            var foodX = [];
-            var foodY = [];
+            var goodFoodX = [];
+            var goodFoodY = [];
+            var badFoodX = [];
+            var badFoodY = [];
             var slink_block_size = 20;
             var can = canvas.getContext('2d');
             var h = 400;
@@ -105,6 +108,7 @@
                     slinkerX.push(i);
                     slinkerY.push(0);
                 }
+
             };
 
             var buildBlock = function(x, y) {
@@ -131,33 +135,83 @@
                 }
             };
 
-            var makeFood = function () {
+            var makeGoodFood = function () {
 
                 var min, max = 0;
                 min = 1; max = w / slink_block_size;
-                foodX[0] = Math.floor(Math.random() * (max - min + 1)) + min;
+                goodFoodX[0] = Math.floor(Math.random() * (max - min + 1)) + min;
                 min = 1; max = h / slink_block_size;
-                foodY[0] = Math.floor(Math.random() * (max - min + 1)) + min;
+                goodFoodY[0] = Math.floor(Math.random() * (max - min + 1)) + min;
 
                 do {
                     for(var i = 0; i < slinkerX.length; i++) {
-                        if (foodX[0] === slinkerX[i] || foodY[0] === slinkerY[i]) {
+                        if (goodFoodX[0] === slinkerX[i] || goodFoodY[0] === slinkerY[i]) {
                             min = 1; max = w / slink_block_size;
-                            foodX[0] = Math.floor(Math.random() * (max - min + 1)) + min;
+                            goodFoodX[0] = Math.floor(Math.random() * (max - min + 1)) + min;
                             min = 1; max = h / slink_block_size;
-                            foodY[0] = Math.floor(Math.random() * (max - min + 1)) + min;
+                            goodFoodY[0] = Math.floor(Math.random() * (max - min + 1)) + min;
                         }
                     }
-                } while (foodX[0] === slinkerX[i] && foodY[0] === slinkerY[i]);
+                } while (goodFoodX[0] === slinkerX[i] && goodFoodY[0] === slinkerY[i]);
 
-                console.log("leaving makeFood: foodX[0] = " + foodX[0] + " foodY[0] = " + foodY[0]);
+                console.log("leaving makeGoodFood: goodFoodX[0] = " + goodFoodX[0] + " goodFoodY[0] = " + goodFoodY[0]);
             };
 
-            var paintFood = function () {
+            var paintGoodFood = function () {
 
                 can.fillStyle = 'red';
-                can.fillRect(foodX[0] * slink_block_size, foodY[0] * slink_block_size, slink_block_size, slink_block_size);
+                can.fillRect(goodFoodX[0] * slink_block_size, goodFoodY[0] * slink_block_size, slink_block_size, slink_block_size);
             };
+
+
+            var makeBadFood = function () {
+
+                var min, max = 0;
+                min = 1; max = w / slink_block_size;
+                badFoodX[0] = Math.floor(Math.random() * (max - min + 1)) + min;
+                min = 1; max = h / slink_block_size;
+                badFoodY[0] = Math.floor(Math.random() * (max - min + 1)) + min;
+
+                do {
+                    for(i = 0; i < slinkerX.length; i++) {
+                        if (goodFoodX[0] === slinkerX[i] || goodFoodY[0] === slinkerY[i]) {
+                            min = 1; max = w / slink_block_size;
+                            goodFoodX[0] = Math.floor(Math.random() * (max - min + 1)) + min;
+                            min = 1; max = h / slink_block_size;
+                            goodFoodY[0] = Math.floor(Math.random() * (max - min + 1)) + min;
+                        }
+                    }
+                } while (badFoodX[0] === slinkerX[i] && badFoodY[0] === slinkerY[i]);
+
+                min = 1; max = w / slink_block_size;
+                badFoodX[1] = Math.floor(Math.random() * (max - min + 1)) + min;
+                min = 1; max = h / slink_block_size;
+                badFoodY[1] = Math.floor(Math.random() * (max - min + 1)) + min;
+
+                do {
+                    for(i = 0; i < slinkerX.length; i++) {
+                        if (badFoodX[1] === slinkerX[i] || badFoodY[1] === slinkerY[i]) {
+                            min = 1; max = w / slink_block_size;
+                            badFoodX[1] = Math.floor(Math.random() * (max - min + 1)) + min;
+                            min = 1; max = h / slink_block_size;
+                            badFoodY[1] = Math.floor(Math.random() * (max - min + 1)) + min;
+                        }
+                    }
+                } while (badFoodX[1] === slinkerX[i] && badFoodY[1] === slinkerY[i]);
+
+
+                console.log("leaving makeBadFood: badFoodX[1] = " + badFoodX[0] + " badFoodY[1] = " + badFoodY[1]);
+            };
+
+            var paintBadFood = function () {
+
+                can.fillStyle = 'green';
+                can.fillRect(badFoodX[0] * slink_block_size, badFoodY[0] * slink_block_size, slink_block_size, slink_block_size);
+                can.fillRect(badFoodX[1] * slink_block_size, badFoodY[1] * slink_block_size, slink_block_size, slink_block_size);
+
+            };
+
+
 
 
             var collision = false;
@@ -196,30 +250,38 @@
                 can.fillRect(0, 0, w, h);
 
                 // draw the food item
-                paintFood();
+                paintGoodFood();
+                paintBadFood();
 
                 var headX = slinkerX[0];
                 var headY = slinkerY[0];
 
                 if (direction === 'right') {
-                    headX++; }
+                    headX++;
+                }
                 else if (direction === 'left') {
-                    headX--; }
+                    headX--;
+                }
                 else if (direction === 'up') {
                     headY--;
-                } else if(direction === 'down') {
-                    headY++; }
-
-                // check for collision of head of slinker with food item
-                if (headX === foodX[0] && headY === foodY[0]) {
-                    makeFood();
-                } else {
-                    slinkerX.pop();
-                    slinkerY.pop();
+                } else if (direction === 'down') {
+                    headY++;
                 }
 
                 collision = false;
                 checkCollide();
+
+                // check for collision of head of slinker with food item
+                if (headX === goodFoodX[0] && headY === goodFoodY[0]) {
+                    makeGoodFood();
+                } else if ((headX === badFoodX[0] && headY === badFoodY[0]) ||
+                            (headX === badFoodX[1] && headY === badFoodY[1])) {
+                    $('#collide').html("OUCHIES");
+                    clearInterval(loop);
+                } else {
+                    slinkerX.pop();
+                    slinkerY.pop();
+                }
 
                 // testing code, adds a block to the end of slinker every 10 intervals
                 /*
@@ -254,12 +316,14 @@
             var mainLoop = function() {
                 slinkerX = [];
                 slinkerY = [];
-                foodX = [];
-                foodY = [];
+                goodFoodX = [];
+                goodFoodY = [];
                 direction = 'down';
                 makeInitSlinker();
-                makeFood();
-                paintFood();
+                makeGoodFood();
+                paintGoodFood();
+                makeBadFood();
+                paintBadFood();
                 paintSlinker();
                 loop = setInterval(moveSlinker, 180);
             //}();
