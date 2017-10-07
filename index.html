@@ -81,6 +81,8 @@
             }
         });
 
+
+
         // using Module pattern: https://toddmotto.com/mastering-the-module-pattern/
         var drawModule = (function () {
 
@@ -174,8 +176,7 @@
                 if (collision) {
                     $('#collide').html("OUCHIES");
                     clearInterval(loop);
-                    var myButton = document.getElementById('runButton');
-                    myButton.addEventListener("click", mainLoop());
+
 
                 } else {
                     $('#collide').html("");
@@ -251,19 +252,33 @@
 
 
             var mainLoop = function() {
+                slinkerX = [];
+                slinkerY = [];
+                foodX = [];
+                foodY = [];
                 direction = 'down';
                 makeInitSlinker();
                 makeFood();
                 paintFood();
                 paintSlinker();
                 loop = setInterval(moveSlinker, 180);
-            }();
+            //}();
+            };
 
             return {
                 mainLoop : mainLoop
             };
 
         })();
+
+        var myButton = document.getElementById('runButton');
+
+        (function (drawModule) {
+
+            myButton.addEventListener("click", function () { drawModule.mainLoop();});
+
+        }) (drawModule);
+
 
     </script>
 
