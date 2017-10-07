@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Magnificent Snake Game</title>
+
+    <style>
+
+        .view_port {
+
+            margin: auto;
+            width: 50%;
+            padding: 70px 0;
+            border: 3px solid green;
+            text-align: center;
+
+        }
+
+        #canvas {
+            background-color: lightgrey;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="view_port">
+        <h1>Slitherin Slinky</h1>
+    </div>
+
+    <div>
+        <p></p>
+    </div>
+
+    <div class="view_port">
+
+        <canvas id="canvas" height="400" width="600"></canvas>
+
+
+    </div>
+
+
+
+    <script>
+
+
+        //window.onkeydown = function() {
+
+        //var keyCode = window.event.keyCode;
+        //    keyCode = window.event.keyCode;
+
+        // function checkKey(event) {
+
+        addEventListener("keydown", function(event) {
+
+
+            switch(event.keyCode) {
+
+                case 37:
+                    if (direction !== 'right') {
+                        direction = 'left';
+                    }
+                    break;
+
+                case 39:
+                    if (direction !== 'left') {
+                        direction = 'right';
+                    }
+                    break;
+
+                case 38:
+                    if (direction !== 'down') {
+                        direction = 'up';
+                    }
+                    break;
+
+                case 40:
+                    if (direction !== 'up') {
+                        direction = 'down';
+                    }
+                    break;
+            }
+
+            console.log("direction = " + direction);
+
+        });
+
+
+
+        // using Module pattern: https://toddmotto.com/mastering-the-module-pattern/
+        var drawModule = (function () {
+
+            var slinkerX = [];
+            var slinkerY = [];
+            var slink_block_size = 20;
+            var can = canvas.getContext('2d');
+            var h = 400;
+            var w = 600;
+            var colorWhite = true;
+
+            var makeInitSlinker = function() {
+                var length = 4;
+                //slinker = [];
+                for (var i = 0 ; i < length; i++) {
+                    console.log("var i = " + i);
+                    console.log("slinkerX[i] = " + slinkerX[i]);
+                    console.log("slinkerY[i] = " + slinkerY[i]);
+                    slinkerX.push(i);
+                    slinkerY.push(0);
+                }
+            };
+
+            var buildBlock = function(x, y) {
+
+                console.log("entering buildBlock ... colorWhite value is " + colorWhite);
+
+                if (colorWhite) {
+                    can.fillStyle = 'white';
+                    colorWhite = false;
+                } else {
+                    can.fillStyle = 'blue';
+                }
+
+                can.fillRect(x * slink_block_size, y * slink_block_size, slink_block_size, slink_block_size);
+
+            };
+
+            var paintSlinker = function(x, y) {
+
+                for (var i = 0; i < slinkerX.length; i++) {
+
+                    buildBlock(x, y);
+
+                }
+            };
+
+            var counter = 0;
+
+            var moveSlink = function() {
+
+                counter++;
+
+                can.fillStyle = 'lightgrey';
+                can.fillRect(0, 0, w, h);
+
+                var headX = slinkerX[0];
+                var headY = slinkerY[0];
+
+                if (direction === 'right') {
+                    headX++; }
+                else if (direction === 'left') {
+                    headX--; }
+                else if (direction === 'up') {
+                    headY--;
+                } else if(direction === 'down') {
+                    headY++; }
+
+
+                //tail = slinkerX.pop(); //pops out the last cell
+                //tail.x = headX;
+                //tail.y = headY;
+    //            headX = slinkerX.pop();
+    //            headY = slinkerY.pop();
+
+
+                slinkerX.pop();
+                slinkerY.pop();
+
+                //slinker.unshift(tail); //puts back the tail as the first cell
+                slinkerX.unshift(headX);
+                slinkerY.unshift(headY);
+
+                colorWhite = true;
+                for(var i = 0; i < slinkerX.length; i++) {
+                    console.log("i = " + i + " slinkerX[i] = " + slinkerX[i] + " slinkerY[i] = " + slinkerY[i] + " colorWhite = " + colorWhite);
+                    buildBlock(slinkerX[i], slinkerY[i]);
+                }
+
+                console.log("counter =  " + counter);
+                if (counter > 25) {
+                    clearInterval(loop);
+                }
+
+            };
+
+            var mainLoop = function() {
+                direction = 'down';
+                makeInitSlinker();
+                paintSlinker();
+                loop = setInterval(moveSlink, 180);
+            }();
+
+            return {
+                mainLoop : mainLoop
+            };
+
+        }());
+
+
+    </script>
+
+</body>
+</html>
