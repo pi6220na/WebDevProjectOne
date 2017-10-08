@@ -97,7 +97,9 @@
             var can = canvas.getContext('2d');
             var h = 400;
             var w = 600;
+            var badFoodCount = 10;
             var colorWhite = true;
+            var setRunButton = true;
 
             var makeInitSlinker = function() {
                 var length = 4;
@@ -229,9 +231,9 @@
 
                 if (collision) {
                     $('#collide').html("OUCHIES");
+                    $('#runButton').text("RUN GAME");
+                    setRunButton = true;
                     clearInterval(loop);
-
-
                 } else {
                     $('#collide').html("");
                     console.log("no ouchies")
@@ -277,6 +279,8 @@
                 } else if ((headX === badFoodX[0] && headY === badFoodY[0]) ||
                             (headX === badFoodX[1] && headY === badFoodY[1])) {
                     $('#collide').html("OUCHIES");
+                    $('#runButton').text("RUN GAME");
+                    setRunButton = true;
                     clearInterval(loop);
                 } else {
                     slinkerX.pop();
@@ -301,7 +305,9 @@
                     buildBlock(slinkerX[i], slinkerY[i]);
                 }
 
-                $('#runButton').html(slinkerX.length);
+                if (!setRunButton) {
+                    $('#runButton').html(slinkerX.length);
+                }
 
                 /*
                 console.log("counter =  " + counter);
@@ -319,6 +325,7 @@
                 goodFoodX = [];
                 goodFoodY = [];
                 direction = 'down';
+                setRunButton = false;
                 makeInitSlinker();
                 makeGoodFood();
                 paintGoodFood();
