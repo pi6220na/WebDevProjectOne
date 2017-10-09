@@ -149,17 +149,17 @@
 
                 var min, max;
                 min = 1; max = w / slink_block_size;
-                goodFoodX[0] = Math.floor(Math.random() * (max - min + 1)) + min;
+                goodFoodX[0] = Math.floor(Math.random() * (max - min + 2)) + min;
                 min = 1; max = h / slink_block_size;
-                goodFoodY[0] = Math.floor(Math.random() * (max - min + 1)) + min;
+                goodFoodY[0] = Math.floor(Math.random() * (max - min + 2)) + min;
 
                 do {
                     for(var i = 0; i < slinkerX.length; i++) {
                         if (goodFoodX[0] === slinkerX[i] || goodFoodY[0] === slinkerY[i]) {
                             min = 1; max = w / slink_block_size;
-                            goodFoodX[0] = Math.floor(Math.random() * (max - min + 1)) + min;
+                            goodFoodX[0] = Math.floor(Math.random() * (max - min + 2)) + min;
                             min = 1; max = h / slink_block_size;
-                            goodFoodY[0] = Math.floor(Math.random() * (max - min + 1)) + min;
+                            goodFoodY[0] = Math.floor(Math.random() * (max - min + 2)) + min;
                         }
                     }
                 } while (goodFoodX[0] === slinkerX[i] && goodFoodY[0] === slinkerY[i]);
@@ -188,17 +188,18 @@
 
                     do {
                         for(j = 0; j < slinkerX.length; j++) {
-                            if (badFoodX[i] === slinkerX[j] || badFoodY[0] === slinkerY[j]
-                                || badFoodX[i] === goodFoodX[0] || badFoodY[i] === goodFoodY[0]) {
+                            //if ((badFoodX[i] === slinkerX[j] && badFoodY[0] === slinkerY[j])
+                            //    || (badFoodX[i] === goodFoodX[0] && badFoodY[i] === goodFoodY[0])) {
                                 badFoodX[i] = Math.floor(Math.random() * (maxX - min + 1)) + min;
                                 badFoodY[i] = Math.floor(Math.random() * (maxY - min + 1)) + min;
-                            }
+                            //}
                         }
-                    } while (badFoodX[i] === slinkerX[j] && badFoodY[i] === slinkerY[j]);
+                    } while ((badFoodX[i] === slinkerX[j] && badFoodY[i] === slinkerY[j])
+                          || (badFoodX[i] === goodFoodX[0] && badFoodY[i] === goodFoodY[0]) );
 
+                    //console.log("leaving makeBadFood: badFoodX[i] = " + badFoodX[i] + " badFoodY[i] = " + badFoodY[i]);
                 }
 
-                console.log("leaving makeBadFood: badFoodX[i] = " + badFoodX[i] + " badFoodY[i] = " + badFoodY[i]);
             };
 
             var paintBadFood = function () {
