@@ -1,9 +1,16 @@
+<!-- Web Development MCTC Project One
+     Jeremy Wolfe
+     October 10, 2017
+
+     A "snake" game implemented in HTML, CSS, and Javascipt.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
 
-    <title>Magnificent Snake Game</title>
+    <title>Slinker, the Game</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link href='https://fonts.googleapis.com/css?family=Bungee Shade' rel='stylesheet'>
@@ -53,14 +60,12 @@
 
         <canvas id="canvas" height="400" width="600"></canvas>
 
-
     </div>
-
 
 
     <script>
 
-
+        // attach an event listener to the keydown event
         addEventListener("keydown", function(event) {
             switch(event.keyCode) {
 
@@ -90,11 +95,14 @@
             }
         });
 
+        // using Module design pattern: https://toddmotto.com/mastering-the-module-pattern/
+        // this link provides an excellent overview!
 
-
-        // using Module pattern: https://toddmotto.com/mastering-the-module-pattern/
+        // Most functionality is contained within the drawModule function. The functions within it
+        // are "private" functions, or as private as can be accomplished with Javascript.
         var drawModule = (function () {
 
+            // "global" variables within the drawModule context
             var slinkerX = [];
             var slinkerY = [];
             var goodFoodX = [];
@@ -109,6 +117,7 @@
             var colorWhite = true;
             var setRunButton = true;
 
+            // this function makes the initial 4 block long slinker
             var makeInitSlinker = function() {
                 var length = 4;
                 for (var i = 0 ; i < length; i++) {
@@ -121,6 +130,7 @@
 
             };
 
+            // draw a white block (if first call) or blue block at location based on passed in parameters
             var buildBlock = function(x, y) {
 
                 //console.log("entering buildBlock ... colorWhite value is " + colorWhite);
@@ -136,6 +146,7 @@
 
             };
 
+            // draw slinker by passing x, y coordinates to the buildBlock function
             var paintSlinker = function(x, y) {
 
                 for (var i = 0; i < slinkerX.length; i++) {
@@ -145,21 +156,23 @@
                 }
             };
 
+            // fixed problem of disapearing food block, due to random coordinate off the canvas
+            // generate one food item block
             var makeGoodFood = function () {
 
                 var min, max;
                 min = 1; max = w / slink_block_size;
-                goodFoodX[0] = Math.floor(Math.random() * (max - min + 2)) + min;
+                goodFoodX[0] = Math.floor(Math.random() * (max - min)) + min;
                 min = 1; max = h / slink_block_size;
-                goodFoodY[0] = Math.floor(Math.random() * (max - min + 2)) + min;
+                goodFoodY[0] = Math.floor(Math.random() * (max - min)) + min;
 
                 do {
                     for(var i = 0; i < slinkerX.length; i++) {
                         if (goodFoodX[0] === slinkerX[i] || goodFoodY[0] === slinkerY[i]) {
                             min = 1; max = w / slink_block_size;
-                            goodFoodX[0] = Math.floor(Math.random() * (max - min + 2)) + min;
+                            goodFoodX[0] = Math.floor(Math.random() * (max - min)) + min;
                             min = 1; max = h / slink_block_size;
-                            goodFoodY[0] = Math.floor(Math.random() * (max - min + 2)) + min;
+                            goodFoodY[0] = Math.floor(Math.random() * (max - min)) + min;
                         }
                     }
                 } while (goodFoodX[0] === slinkerX[i] && goodFoodY[0] === slinkerY[i]);
@@ -167,6 +180,7 @@
                 console.log("leaving makeGoodFood: goodFoodX[0] = " + goodFoodX[0] + " goodFoodY[0] = " + goodFoodY[0]);
             };
 
+            // draw the good food
             var paintGoodFood = function () {
 
                 can.fillStyle = 'red';
@@ -174,6 +188,7 @@
             };
 
 
+            // randomly generate badFoodCount number of blocks
             var makeBadFood = function () {
 
                 var min, maxX, maxY = 0;
@@ -202,19 +217,21 @@
 
             };
 
+            // draw the bad blocks
             var paintBadFood = function () {
 
                 for (i = 0; i < badFoodCount; i++) {
                     can.fillStyle = 'green';
                     can.fillRect(badFoodX[i] * slink_block_size, badFoodY[i] * slink_block_size, slink_block_size, slink_block_size);
+                    if (badFoodX[i] === goodFoodX[0] && badFoodY[i] === goodFoodY[0]) {
+                        console.log("Whoah.... not working");
+                    }
                 }
             };
 
 
-
-
             var collision = false;
-
+            // checks to see if head of slinker has run into its body
             var checkCollideSelf = function () {
 
                 var testX = slinkerX[0];
@@ -233,11 +250,12 @@
                     clearInterval(loop);
                 } else {
                     $('#collide').html("");
-                    console.log("no ouchies")
+                    //console.log("no ouchies")
                 }
 
             };
 
+            // checks to see if slinker has run into a green badFood block
             var checkBadCollide = function () {
 
                 var testX = slinkerX[0];
@@ -245,6 +263,8 @@
                 if (testX === goodFoodX[0] && testY === goodFoodY[0]) {
                     makeGoodFood();
                     return;
+                    // by returning here we don't remove "pop" the last block off slinker, therefore slinker
+                    // will grow by one block
                 }
 
                 for (i = 0; i < badFoodCount; i++) {
@@ -264,7 +284,9 @@
 
 
             var counter = 0;
-
+            // main game loop -
+            //    clears the canvas, repaints good and bad food, determines direction slinker heading,
+            //    checks for collisions with self or bad food
             var moveSlinker = function() {
 
                 counter++;
@@ -298,7 +320,6 @@
                 // check for collision of head of slinker with food item
                 checkBadCollide();
 
-
                 // testing code, adds a block to the end of slinker every 10 intervals
                 /*
                 if (!(counter % 10 === 0)) {
@@ -307,16 +328,18 @@
                 }
                 */
 
-                //slinker.unshift(tail); //puts back the tail as the first cell
+                // puts updated x/y coordinates on "front" of array
                 slinkerX.unshift(headX);
                 slinkerY.unshift(headY);
 
+                // this code builds and draws slinker with a white colored head
                 colorWhite = true;
                 for(var i = 0; i < slinkerX.length; i++) {
                     //console.log("i = " + i + " slinkerX[i] = " + slinkerX[i] + " slinkerY[i] = " + slinkerY[i] + " colorWhite = " + colorWhite);
                     buildBlock(slinkerX[i], slinkerY[i]);
                 }
 
+                // shows how big the slinker is getting - overwrites run button text
                 if (!setRunButton) {
                     $('#runButton').html(slinkerX.length);
                 }
@@ -331,6 +354,8 @@
             };
 
 
+            // this sets up everything and kicks off the loop setInterval which causes the moveSlinker function
+            // to execute every 180 milliseconds
             var mainLoop = function() {
                 slinkerX = [];
                 slinkerY = [];
@@ -354,8 +379,11 @@
 
         })();
 
+        // a true global variable
         var myButton = document.getElementById('runButton');
 
+        // this anonymous function runs once when first parsed by Javascript compiler
+        // and kicks off the game run.
         (function (drawModule) {
 
             myButton.addEventListener("click", function () { drawModule.mainLoop();});
