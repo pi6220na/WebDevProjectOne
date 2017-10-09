@@ -6,13 +6,14 @@
     <title>Magnificent Snake Game</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Bungee Shade' rel='stylesheet'>
 
     <style>
         .view_port {
 
             margin: auto;
             width: 50%;
-            padding: 70px 0;
+            padding: 40px 0;
             border: 3px solid green;
             text-align: center;
 
@@ -24,6 +25,13 @@
 
         p {
             text-align: center;
+        }
+
+        h1 {
+            font-family: 'Bungee Shade';font-size: 42px;
+            background: -webkit-linear-gradient(green, red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     </style>
 
@@ -97,7 +105,7 @@
             var can = canvas.getContext('2d');
             var h = 400;
             var w = 600;
-            var badFoodCount = 20;
+            var badFoodCount = 40;
             var colorWhite = true;
             var setRunButton = true;
 
