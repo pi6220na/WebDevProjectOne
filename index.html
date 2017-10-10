@@ -50,10 +50,12 @@
         }
 
         .messages {
-            font-family: 'Bungee Shade', cursive;font-size: 16px;
-            background: -webkit-linear-gradient(red, green);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-family: 'Creepster', cursive;font-size: 16px;
+            color: red;
+        }
+
+        span {
+            width: 20px;
         }
     </style>
 
@@ -63,7 +65,7 @@
     <div class="view_port">
         <h1>Slitherin Slinker</h1>
         <button class="messages" id="runButton">RUN GAME</button>
-        <p class="numbers"><span>SCORE: </span><span id="sLength"></span></p>
+        <p class="numbers"><span>SCORE: </span><span id="sLength"></span><span> High Score: </span><span id="high"></span></p>
         <p class="numbers"><span>Messages: </span><span id="collide"></span></p>
     </div>
 
@@ -131,6 +133,7 @@
             var badFoodCount = 40;
             var colorWhite = true;
             var setRunButton = true;
+            var highSscore = 0;
 
             // this method makes the initial 4 block long slinker
             var makeInitSlinker = function() {
@@ -262,6 +265,10 @@
                     $('#collide').html("OUCHIES");
                     $('#runButton').text("RUN GAME");
                     setRunButton = true;
+                    if (slinkerX.length > highSscore) {
+                        highSscore = slinkerX.length;
+                        $('#high').html(highSscore);
+                    }
                     clearInterval(loop);
                 } else {
                     $('#collide').html("");
@@ -287,6 +294,10 @@
                         $('#collide').html("OUCHIES");
                         $('#runButton').text("RUN GAME");
                         setRunButton = true;
+                        if (slinkerX.length > highSscore) {
+                            highSscore = slinkerX.length;
+                            $('#high').html(highSscore);
+                        }
                         clearInterval(loop);
                         return;
                     }
@@ -357,6 +368,10 @@
                 // shows how many blocks the slinker is getting
                 if (!setRunButton) {
                     $('#sLength').html(slinkerX.length);
+                    if (slinkerX.length > highSscore) {
+                        highSscore = slinkerX.length;
+                        $('#high').html(highSscore);
+                    }
                 }
 
                 /*
