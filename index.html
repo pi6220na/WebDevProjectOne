@@ -17,7 +17,7 @@
     <title>Slinker, the Game</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <link href='https://fonts.googleapis.com/css?family=Bungee Shade' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Black Ops One|Creepster|Bungee Shade' rel='stylesheet'>
 
     <style>
         .view_port {
@@ -39,8 +39,19 @@
         }
 
         h1 {
-            font-family: 'Bungee Shade';font-size: 46px;
+            font-family: 'Bungee Shade', cursive;font-size: 46px;
             background: -webkit-linear-gradient(green, red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .numbers {
+            font-family: 'Creepster', cursive;font-size: 26px;
+        }
+
+        .messages {
+            font-family: 'Bungee Shade', cursive;font-size: 16px;
+            background: -webkit-linear-gradient(red, green);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -50,10 +61,10 @@
 <body>
 
     <div class="view_port">
-        <h1>Slitherin Slinky</h1>
-        <button id="runButton">RUN GAME</button>
-        <p id="sLength"></p>
-        <p><span>Messages: </span><span id="collide"></span></p>
+        <h1>Slitherin Slinker</h1>
+        <button class="messages" id="runButton">RUN GAME</button>
+        <p class="numbers"><span>SCORE: </span><span id="sLength"></span></p>
+        <p class="numbers"><span>Messages: </span><span id="collide"></span></p>
     </div>
 
     <div>
@@ -343,9 +354,9 @@
                     buildBlock(slinkerX[i], slinkerY[i]);
                 }
 
-                // shows how big the slinker is getting - overwrites run button text
+                // shows how many blocks the slinker is getting
                 if (!setRunButton) {
-                    $('#runButton').html(slinkerX.length);
+                    $('#sLength').html(slinkerX.length);
                 }
 
                 /*
