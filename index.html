@@ -3,6 +3,10 @@
      October 10, 2017
 
      A "snake" game implemented in HTML, CSS, and Javascipt.
+
+     The programming is moduled on the following example:
+     http://www.competa.com/blog/how-to-build-a-snake-game-using-javascript-and-html5-canvas/
+     The game layout, name, data structures, game play, and enhancements are my own.
 -->
 
 <!DOCTYPE html>
@@ -98,8 +102,8 @@
         // using Module design pattern: https://toddmotto.com/mastering-the-module-pattern/
         // this link provides an excellent overview!
 
-        // Most functionality is contained within the drawModule function. The functions within it
-        // are "private" functions, or as private as can be accomplished with Javascript.
+        // Most functionality is contained within the drawModule function. The methods (functions) within it
+        // are "private", or as private as can be accomplished with Javascript.
         var drawModule = (function () {
 
             // "global" variables within the drawModule context
@@ -117,7 +121,7 @@
             var colorWhite = true;
             var setRunButton = true;
 
-            // this function makes the initial 4 block long slinker
+            // this method makes the initial 4 block long slinker
             var makeInitSlinker = function() {
                 var length = 4;
                 for (var i = 0 ; i < length; i++) {
@@ -224,7 +228,7 @@
                     can.fillStyle = 'green';
                     can.fillRect(badFoodX[i] * slink_block_size, badFoodY[i] * slink_block_size, slink_block_size, slink_block_size);
                     if (badFoodX[i] === goodFoodX[0] && badFoodY[i] === goodFoodY[0]) {
-                        console.log("Whoah.... not working");
+                        console.log("Whoah.... not working, i = " + i + "badFood[i] = " + badFoodX[i] + "," + badFoodY[i] + "goodFood[0] " + goodFoodX[0] + "," + goodFoodY[0]);
                     }
                 }
             };
@@ -354,8 +358,8 @@
             };
 
 
-            // this sets up everything and kicks off the loop setInterval which causes the moveSlinker function
-            // to execute every 180 milliseconds
+            // this sets up everything and kicks off the loop setInterval which causes the moveSlinker method
+            // to execute every 180 milliseconds (.18 seconds)
             var mainLoop = function() {
                 slinkerX = [];
                 slinkerY = [];
@@ -370,7 +374,6 @@
                 paintBadFood();
                 paintSlinker();
                 loop = setInterval(moveSlinker, 180);
-            //}();
             };
 
             return {
@@ -382,8 +385,9 @@
         // a true global variable
         var myButton = document.getElementById('runButton');
 
-        // this anonymous function runs once when first parsed by Javascript compiler
-        // and kicks off the game run.
+        // this IIFE (immediately invoked function expression) function runs once when first parsed by Javascript compiler
+        // and kicks off the run game drawModule, as well as hooking up the myButton event listener, as well as creating
+        // the new scope (everything within drawModule is hidden from the outside world except what is returned).
         (function (drawModule) {
 
             myButton.addEventListener("click", function () { drawModule.mainLoop();});
