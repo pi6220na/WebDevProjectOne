@@ -32,8 +32,17 @@
 
         #canvas {
             background-color: lightgrey;
-            transition: all 25.5s ease-in-out;
+            border-width: 3px;
+            border-color:  green;
+            /*transition: all 25.5s ease-in-out;
+             animation:spin 60s linear infinite; */
+            animation: wiggle 20s linear infinite;
         }
+
+        /* https://stackoverflow.com/questions/16771225/css3-rotate-animation */
+        /* @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } } */
+        @keyframes wiggle { 0% { transform:rotate(45deg); } 50% { transform:rotate(-45deg); } 100% { transform:rotate(45deg); }}
+
 
         p {
             text-align: center;
@@ -73,10 +82,13 @@
             -o-transform : rotate(66deg);
             transform : rotate(365deg);
         }
+
     </style>
 
 </head>
 <body>
+
+
 
     <div class="view_port">
         <h3>Slitherin Slinker</h3>
@@ -91,7 +103,7 @@
 
     <div class="view_port">
 
-        <canvas id="canvas" height="400" width="600"></canvas>
+        <canvas id="canvas" height="400" width="600" style="border-top:8px solid green;"></canvas>
 
     </div>
 
