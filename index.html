@@ -35,13 +35,14 @@
             border-width: 3px;
             border-color:  green;
             /*transition: all 25.5s ease-in-out;
-             animation:spin 60s linear infinite; */
-            animation: wiggle 20s linear infinite;
+             animation:spin 60s linear infinite;
+            animation: wiggle 20s linear infinite; */
+            animation: wobble 30s ease infinite;
         }
 
         /* https://stackoverflow.com/questions/16771225/css3-rotate-animation */
         /* @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } } */
-        @keyframes wiggle { 0% { transform:rotate(45deg); } 50% { transform:rotate(-45deg); } 100% { transform:rotate(45deg); }}
+        @keyframes wobble { 0% { transform:rotate(45deg); } 50% { transform:rotate(-45deg); } 100% { transform:rotate(45deg); }}
 
 
         p {
@@ -75,6 +76,7 @@
             background-color: aqua;
         }
 
+        /*
         #canvas:hover {
             -webkit-transform : rotate(66deg);
             -moz-transform : rotate(66deg);
@@ -82,6 +84,7 @@
             -o-transform : rotate(66deg);
             transform : rotate(365deg);
         }
+        */
 
     </style>
 
