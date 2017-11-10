@@ -158,11 +158,11 @@
             var goodFoodY = [];
             var badFoodX = [];
             var badFoodY = [];
-            var slink_block_size = 20;
+            var slink_block_size = 15;
             var can = canvas.getContext('2d');
             var h = 400;
             var w = 600;
-            var badFoodCount = 40;
+            var badFoodCount = 20;
             var colorWhite = true;
             var setRunButton = true;
             var highSscore = 0;
@@ -357,6 +357,13 @@
                 paintGoodFood();
                 paintBadFood();
 
+                collision = false;
+                checkCollideSelf();
+
+                // check for collision of head of slinker with food item
+                checkBadCollide();
+
+
                 var headX = slinkerX[0];
                 var headY = slinkerY[0];
 
@@ -372,19 +379,6 @@
                     headY++;
                 }
 
-                collision = false;
-                checkCollideSelf();
-
-                // check for collision of head of slinker with food item
-                checkBadCollide();
-
-                // testing code, adds a block to the end of slinker every 10 intervals
-                /*
-                if (!(counter % 10 === 0)) {
-                    slinkerX.pop();
-                    slinkerY.pop();
-                }
-                */
 
                 // puts updated x/y coordinates on "front" of array
                 slinkerX.unshift(headX);
