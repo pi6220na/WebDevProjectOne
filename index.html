@@ -301,7 +301,7 @@
                         highSscore = slinkerX.length;
                         $('#high').html(highSscore);
                     }
-                    clearInterval(loop);
+                 //   clearInterval(loop);
                 } else {
                     $('#collide').html("");
                     //console.log("no ouchies")
@@ -330,7 +330,7 @@
                             highSscore = slinkerX.length;
                             $('#high').html(highSscore);
                         }
-                        clearInterval(loop);
+                  //      clearInterval(loop);
                         return;
                     }
                 }
@@ -345,7 +345,49 @@
             // main game loop -
             //    clears the canvas, repaints good and bad food, determines direction slinker heading,
             //    checks for collisions with self or bad food
-            var moveSlinker = function() {
+
+
+            var GameLoop = function(fn, fps){
+                fps = fps || 60;
+
+                var now;
+                var delta;
+                var interval;
+                var then = new Date().getTime();
+
+                var frames;
+                var oldtime = 0;
+
+                return (function loop(time){
+                    requestAnimationFrame(loop);
+
+                    interval = 1000/(this.fps||fps);
+                    now = new Date().getTime();
+                    delta = now - then;
+
+                    if (delta > interval) {
+                        // update time stuffs
+                        then = now - (delta % interval);
+
+                        // calculate the frames per second
+                        frames = 1000/(time-oldtime)
+                        oldtime = time;
+
+                        // call the fn
+                        // and pass current fps to it
+                        fn(frames);
+                    }
+                }(0));
+            };
+
+
+
+
+            GameLoop(function(fps){
+                if(set) this.fps = 5;
+                console.log(fps);
+
+            // var moveSlinker = function() {
 
                 counter++;
 
@@ -413,10 +455,13 @@
                 }
                 */
 
-            };
+
+            }, 5);
 
 
-            // this sets up everything and kicks off the loop setInterval which causes the moveSlinker method
+
+
+        // this sets up everything and kicks off the loop setInterval which causes the moveSlinker method
             // to execute every 180 milliseconds (.18 seconds)
             var mainLoop = function() {
                 slinkerX = [];
@@ -431,8 +476,9 @@
                 makeBadFood();
                 paintBadFood();
                 paintSlinker();
-                loop = setInterval(moveSlinker, 180);
+              //  loop = setInterval(moveSlinker, 180);
             };
+
 
             return {
                 mainLoop : mainLoop
@@ -442,13 +488,14 @@
 
         // a true global variable
         var myButton = document.getElementById('runButton');
+        var set;
 
         // this IIFE (immediately invoked function expression) function runs once when first parsed by Javascript compiler
         // and kicks off the run game drawModule, as well as hooking up the myButton event listener, as well as creating
         // the new scope (everything within drawModule is hidden from the outside world except what is returned).
         (function (drawModule) {
 
-            myButton.addEventListener("click", function () { drawModule.mainLoop();});
+            myButton.addEventListener("click", function () {   set = true; drawModule.mainLoop();});
 
         }) (drawModule);
 
