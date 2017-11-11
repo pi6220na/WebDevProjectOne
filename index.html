@@ -95,7 +95,7 @@
 
 
     <div class="view_port">
-        <h3>Slitherin Slinker</h3>
+        <p class="numbers">Slitherin Slinker</p>
         <button class="messages" id="runButton">RUN GAME</button>
         <p class="numbers"><span>SCORE: </span><span id="sLength"></span><span> High Score: </span><span id="high"></span></p>
         <p class="numbers"><span>Messages: </span><span id="collide"></span></p>
@@ -159,10 +159,13 @@
             var badFoodX = [];
             var badFoodY = [];
             var slink_block_size = 20;
+            var block_size = 20;
             var can = canvas.getContext('2d');
             var h = 400;
             var w = 600;
-            var badFoodCount = 40;
+            var gridH = h;
+            var gridW = w;
+            var badFoodCount = 20;
             var colorWhite = true;
             var setRunButton = true;
             var highSscore = 0;
@@ -177,6 +180,41 @@
                     slinkerX.push(i);
                     slinkerY.push(0);
                 }
+
+            };
+
+            /* draw grid lines
+            var paintGrid = function() {
+
+                gridW = w / slink_block_size;
+                gridH = h / slink_block_size;
+
+                /*   cool curved grid effect
+                for (var i = 0; i < w; i+=gridW) {
+                    can.beginPath();
+                    can.moveTo(0, i);
+                    can.lineTo(i, h);
+                    can.stroke();
+                    can.closePath();
+                }
+                */
+
+                for (var i = 0; i < w; i+=slink_block_size) {
+                    can.beginPath();
+                    can.moveTo(0, i);
+                    can.lineTo(w, i);
+                    can.stroke();
+                    can.closePath();
+                }
+                for (var i = 0; i < w; i+=slink_block_size) {
+                    can.beginPath();
+                    can.moveTo(i, 0);
+                    can.lineTo(i, h);
+                    can.stroke();
+                    can.closePath();
+                }
+
+
 
             };
 
@@ -211,9 +249,9 @@
             var makeGoodFood = function () {
 
                 var min, max;
-                min = 1; max = w / slink_block_size;
+                min = 1; max = gridW / slink_block_size;
                 goodFoodX[0] = Math.floor(Math.random() * (max - min)) + min;
-                min = 1; max = h / slink_block_size;
+                min = 1; max = gridH / slink_block_size;
                 goodFoodY[0] = Math.floor(Math.random() * (max - min)) + min;
 
                 do {
@@ -243,8 +281,10 @@
 
                 var min, maxX, maxY = 0;
                 min = 1;
-                maxX = w / slink_block_size;
-                maxY = h / slink_block_size;
+                //maxX = w / slink_block_size;
+                //maxY = h / slink_block_size;
+                maxX = gridW / slink_block_size;
+                maxY = gridH / slink_block_size;
 
                 for (i = 0; i < badFoodCount; i++) {
 
@@ -253,11 +293,8 @@
 
                     do {
                         for(j = 0; j < slinkerX.length; j++) {
-                            //if ((badFoodX[i] === slinkerX[j] && badFoodY[0] === slinkerY[j])
-                            //    || (badFoodX[i] === goodFoodX[0] && badFoodY[i] === goodFoodY[0])) {
                                 badFoodX[i] = Math.floor(Math.random() * (maxX - min + 1)) + min;
                                 badFoodY[i] = Math.floor(Math.random() * (maxY - min + 1)) + min;
-                            //}
                         }
                     } while ((badFoodX[i] === slinkerX[j] && badFoodY[i] === slinkerY[j])
                           || (badFoodX[i] === goodFoodX[0] && badFoodY[i] === goodFoodY[0]) );
@@ -274,7 +311,7 @@
                     can.fillStyle = 'green';
                     can.fillRect(badFoodX[i] * slink_block_size, badFoodY[i] * slink_block_size, slink_block_size, slink_block_size);
                     if (badFoodX[i] === goodFoodX[0] && badFoodY[i] === goodFoodY[0]) {
-                        console.log("Whoah.... not working, i = " + i + "badFood[i] = " + badFoodX[i] + "," + badFoodY[i] + "goodFood[0] " + goodFoodX[0] + "," + goodFoodY[0]);
+                        console.log("Whoah.... not working, i = " + i + "badFoodXY[i] = " + badFoodX[i] + "," + badFoodY[i] + "goodFoodXY[0] " + goodFoodX[0] + "," + goodFoodY[0]);
                     }
                 }
             };
@@ -301,7 +338,7 @@
                         highSscore = slinkerX.length;
                         $('#high').html(highSscore);
                     }
-                 //   clearInterval(loop);
+                    clearInterval(loop);
                 } else {
                     $('#collide').html("");
                     //console.log("no ouchies")
@@ -330,7 +367,7 @@
                             highSscore = slinkerX.length;
                             $('#high').html(highSscore);
                         }
-                  //      clearInterval(loop);
+                        clearInterval(loop);
                         return;
                     }
                 }
@@ -345,49 +382,7 @@
             // main game loop -
             //    clears the canvas, repaints good and bad food, determines direction slinker heading,
             //    checks for collisions with self or bad food
-
-
-            var GameLoop = function(fn, fps){
-                fps = fps || 60;
-
-                var now;
-                var delta;
-                var interval;
-                var then = new Date().getTime();
-
-                var frames;
-                var oldtime = 0;
-
-                return (function loop(time){
-                    requestAnimationFrame(loop);
-
-                    interval = 1000/(this.fps||fps);
-                    now = new Date().getTime();
-                    delta = now - then;
-
-                    if (delta > interval) {
-                        // update time stuffs
-                        then = now - (delta % interval);
-
-                        // calculate the frames per second
-                        frames = 1000/(time-oldtime)
-                        oldtime = time;
-
-                        // call the fn
-                        // and pass current fps to it
-                        fn(frames);
-                    }
-                }(0));
-            };
-
-
-
-
-            GameLoop(function(fps){
-                if(set) this.fps = 5;
-                console.log(fps);
-
-            // var moveSlinker = function() {
+            var moveSlinker = function() {
 
                 counter++;
 
@@ -439,6 +434,8 @@
                     buildBlock(slinkerX[i], slinkerY[i]);
                 }
 
+                paintGrid();
+
                 // shows how many blocks the slinker is getting
                 if (!setRunButton) {
                     $('#sLength').html(slinkerX.length);
@@ -455,13 +452,10 @@
                 }
                 */
 
-
-            }, 5);
-
+            };
 
 
-
-        // this sets up everything and kicks off the loop setInterval which causes the moveSlinker method
+            // this sets up everything and kicks off the loop setInterval which causes the moveSlinker method
             // to execute every 180 milliseconds (.18 seconds)
             var mainLoop = function() {
                 slinkerX = [];
@@ -475,10 +469,10 @@
                 paintGoodFood();
                 makeBadFood();
                 paintBadFood();
+                paintGrid();
                 paintSlinker();
-              //  loop = setInterval(moveSlinker, 180);
+                loop = setInterval(moveSlinker, 180);
             };
-
 
             return {
                 mainLoop : mainLoop
@@ -488,14 +482,13 @@
 
         // a true global variable
         var myButton = document.getElementById('runButton');
-        var set;
 
         // this IIFE (immediately invoked function expression) function runs once when first parsed by Javascript compiler
         // and kicks off the run game drawModule, as well as hooking up the myButton event listener, as well as creating
         // the new scope (everything within drawModule is hidden from the outside world except what is returned).
         (function (drawModule) {
 
-            myButton.addEventListener("click", function () {   set = true; drawModule.mainLoop();});
+            myButton.addEventListener("click", function () { drawModule.mainLoop();});
 
         }) (drawModule);
 
