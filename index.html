@@ -165,7 +165,7 @@
             var w = 600;
             var gridH = [];
             var gridW = [];
-            var badFoodCount = 10;
+            var badFoodCount = 30;
             var colorWhite = true;
             var setRunButton = true;
             var highSscore = 0;
@@ -369,102 +369,51 @@
                 }
 
                 var offset = slink_block_size / 2;
-                    // vertical grid lines
-                    if (slinkerX[0] === goodFoodX[0]) {
-                        console.log("slinkerX = " + slinkerX[0]);
-                        console.log("goodFoodX = " + goodFoodX[0]);
-                        console.log("w = " + w);
+                // vertical grid lines
+                if (slinkerX[0] === goodFoodX[0]) {
+                    console.log("slinkerX = " + slinkerX[0]);
+                    console.log("goodFoodX = " + goodFoodX[0]);
+                    console.log("w = " + w);
 
-                        can.strokeStyle="#AA00FF";
-                        can.beginPath();
-                        can.moveTo(goodFoodX[0]*slink_block_size+offset, 0);
-                        can.lineTo(goodFoodX[0]*slink_block_size+offset, w);
-                        can.closePath();
-                        can.stroke();
+                    can.strokeStyle="#AA00FF";
+                    can.beginPath();
+                    can.moveTo(goodFoodX[0]*slink_block_size+offset, 0);
+                    can.lineTo(goodFoodX[0]*slink_block_size+offset, w);
+                    can.closePath();
+                    can.stroke();
 
-                    } else {
+                } else {
 
-                        can.strokeStyle="#000000";
-                        can.beginPath();
-                        can.moveTo(goodFoodX[0]*slink_block_size+offset, 0);
-                        can.lineTo(goodFoodX[0]*slink_block_size+offset, w);
-                        can.closePath();
-                        can.stroke();
+                    can.strokeStyle="#000000";
+                    can.beginPath();
+                    can.moveTo(goodFoodX[0]*slink_block_size+offset, 0);
+                    can.lineTo(goodFoodX[0]*slink_block_size+offset, w);
+                    can.closePath();
+                    can.stroke();
 
-                    }
-
-
-                    // horizontal grid lines
-                    if (slinkerY[0] === goodFoodY[0]) {
-                        console.log("slinkerY = " + slinkerY[0]);
-                        console.log("goodFoodY = " + goodFoodY[0]);
-                        can.beginPath();
-                        can.moveTo(0, goodFoodY[0]*slink_block_size+offset);
-                        can.lineTo(w, goodFoodY[0]*slink_block_size+offset);
-                        can.closePath();
-                        can.strokeStyle = "#AA00FF";
-                        can.stroke();
-
-                    } else {
-                        can.beginPath();
-                        can.moveTo(0, goodFoodY[0]*slink_block_size+offset);
-                        can.lineTo(w, goodFoodY[0]*slink_block_size+offset);
-                        can.closePath();
-                        can.strokeStyle = "#000000";
-                        can.stroke();
-
-                    }
-
-
-
-
-
-                /*
-                for (i = 0; i < gridW.length; i++) {
-                    if (slinkerX[0] === goodFoodX[0]) {
-                        console.log("slinkerX = " + slinkerX[0]);
-                        console.log("goodFoodX = " + goodFoodX[0]);
-                        can.beginPath();
-                        can.moveTo(0, gridW[i]);
-                        can.lineTo(w, gridW[i]);
-                        can.strokeStyle="#AA00FF";
-                        can.stroke();
-                        can.closePath();
-                    } else {
-                        can.beginPath();
-                        can.moveTo(0, gridW[i]);
-                        can.lineTo(w, gridW[i]);
-                        can.strokeStyle="#000000";
-                        can.stroke();
-                        can.closePath();
-                    }
                 }
 
-                for (i = 0; i < gridH.length; i++) {
-                    if (slinkerY[0] === goodFoodY[0]) {
-                        console.log("slinkerY = " + slinkerY[0]);
-                        console.log("goodFoodY = " + goodFoodY[0]);
-                        can.beginPath();
-                        can.moveTo(gridH[i], 0);
-                        can.lineTo(gridH[i], h);
-                        can.strokeStyle="#AA00FF";
-                        can.stroke();
-                        can.closePath();
-                    } else {
-                        can.beginPath();
-                        can.moveTo(gridH[i], 0);
-                        can.lineTo(gridH[i], h);
-                        can.strokeStyle="#000000";
-                        can.stroke();
-                        can.closePath();
-                    }
+
+                // horizontal grid lines
+                if (slinkerY[0] === goodFoodY[0]) {
+                    console.log("slinkerY = " + slinkerY[0]);
+                    console.log("goodFoodY = " + goodFoodY[0]);
+                    can.beginPath();
+                    can.moveTo(0, goodFoodY[0]*slink_block_size+offset);
+                    can.lineTo(w, goodFoodY[0]*slink_block_size+offset);
+                    can.closePath();
+                    can.strokeStyle = "#AA00FF";
+                    can.stroke();
+
+                } else {
+                    can.beginPath();
+                    can.moveTo(0, goodFoodY[0]*slink_block_size+offset);
+                    can.lineTo(w, goodFoodY[0]*slink_block_size+offset);
+                    can.closePath();
+                    can.strokeStyle = "#000000";
+                    can.stroke();
+
                 }
-                */
-
-
-
-
-
 
 
             };
