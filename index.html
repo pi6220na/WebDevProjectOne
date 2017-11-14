@@ -114,6 +114,11 @@
 
     <script>
 
+        // global var ---- Clara code
+        var gamestate = "";
+
+
+
         // attach an event listener to the keydown event
         addEventListener("keydown", function(event) {
             switch(event.keyCode) {
@@ -335,6 +340,7 @@
                     if (badFoodX[i] === goodFoodX[0] && badFoodY[i] === goodFoodY[0]) {
                         console.log("Whoah.... not working, i = " + i + "badfood X Y[i] = " + badFoodX[i] + "," + badFoodY[i] + "goodFood X Y[0] = " + goodFoodX[0] + "," + goodFoodY[0]);
                         clearInterval(loop);
+                        gamestate = "game over";
                         return;
                     }
                 }
@@ -363,7 +369,11 @@
                         $('#high').html(highSscore);
                     }
                     clearInterval(loop);
+                    gamestate = "game over";
+                    $('selector').click(true);
                 } else {
+                    $('#runButton').text("Playing Game");
+                    $('#runButton').click(false);
                     $('#collide').html("");
                     //console.log("no ouchies")
                 }
@@ -440,7 +450,12 @@
                             $('#high').html(highSscore);
                         }
                         clearInterval(loop);
+                        gamestate = "game over";
+                        $('selector').click(true);
                         return;
+                    } else {
+                        $('#runButton').text("Playing Game");
+                        $('#runButton').click(false);
                     }
                 }
 
@@ -543,7 +558,26 @@
                 paintBadFood();
                 paintGrid();
                 paintSlinker();
-                loop = setInterval(moveSlinker, 180);
+                // in event handler for run button --- Modified from Clara's suggestion
+
+                if (! (gamestate === "playing")) {
+                    gamestate = "playing";
+                    console.log("set gamestate to playing")
+
+                    $('#runButton').text("Playing Game");
+                    $('#runButton').click(false);
+
+                    loop = setInterval(moveSlinker, 180);
+
+
+
+//                } else {
+
+  //                  clearInterval(loop);
+  //                  gamestate = "game over";
+  //                  return;
+                }
+
             };
 
             return {
@@ -560,7 +594,7 @@
         // the new scope (everything within drawModule is hidden from the outside world except what is returned).
         (function (drawModule) {
 
-            myButton.addEventListener("click", function () { drawModule.mainLoop();});
+            myButton.addEventListener("click", function () { drawModule.mainLoop(); document.getElementById("runButton").value= "Playing Game"; $('#runButton').click(false);});
 
         }) (drawModule);
 
