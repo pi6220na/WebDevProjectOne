@@ -228,6 +228,7 @@
 
             };
 
+
             // draw a white block (if first call) or blue block at location based on passed in parameters
             var buildBlock = function(x, y) {
 
@@ -341,11 +342,54 @@
                     can.fillRect(badFoodX[i] * slink_block_size, badFoodY[i] * slink_block_size, slink_block_size, slink_block_size);
                     if (badFoodX[i] === goodFoodX[0] && badFoodY[i] === goodFoodY[0]) {
                         console.log("Whoah.... not working, i = " + i + "badfood X Y[i] = " + badFoodX[i] + "," + badFoodY[i] + "goodFood X Y[0] = " + goodFoodX[0] + "," + goodFoodY[0]);
-                        clearInterval(loop);
                         gamestate = "game over";
+                        $('#runButton').text("RUN GAME");
+                        $('#runButton').removeAttr('disabled');
+                        clearInterval(loop);
                         return;
                     }
                 }
+            };
+
+
+
+            // test for collision with outside edge "wall", wrap to opposite side if collision
+            var checkWallCollide = function() {
+
+                // convert slinker coordinates to screen coordinates
+                var headX = slinkerX[0] * slink_block_size;
+                var headY = slinkerY[0] * slink_block_size;
+
+                if (direction === 'right') {
+                    if (headX >= w) {
+                        headX = 0;
+                        console.log("wrap rightside");
+                    }
+                }
+                else if (direction === 'left') {
+                    if (headX <= 0) {
+                        headX = w;
+                        console.log("wrap leftside");
+                    }
+                }
+                else if (direction === 'up') {
+                    if (headY <= 0) {
+                        headY = h;
+                        console.log("wrap topside");
+                    }
+                }
+                else if (direction === 'down') {
+                    if (headY >= h) {
+                        headY = 0;
+                        console.log("wrap bottomside");
+                    }
+                }
+
+                // convert back from screen coordinates to slinker coordinates
+                slinkerX[0] = headX / slink_block_size;
+                slinkerY[0] = headY / slink_block_size;
+                console.log("leaving checkWallCollide");
+
             };
 
 
@@ -498,7 +542,8 @@
                 }
                 else if (direction === 'up') {
                     headY--;
-                } else if (direction === 'down') {
+                }
+                else if (direction === 'down') {
                     headY++;
                 }
 
@@ -519,6 +564,10 @@
                 // puts updated x/y coordinates on "front" of array
                 slinkerX.unshift(headX);
                 slinkerY.unshift(headY);
+
+
+                checkWallCollide();
+
 
                 // this code builds and draws slinker with a white colored head
                 colorWhite = true;
