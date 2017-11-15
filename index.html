@@ -96,7 +96,7 @@
 
     <div class="view_port">
         <p class="numbers">Slitherin Slinker</p>
-        <button class="messages" id="runButton">RUN GAME</button>
+        <button class="messages" id="runButton" >RUN GAME</button>
         <p class="numbers"><span>SCORE: </span><span id="sLength"></span><span> High Score: </span><span id="high"></span></p>
         <p class="numbers"><span>Messages: </span><span id="collide"></span></p>
     </div>
@@ -113,6 +113,8 @@
 
 
     <script>
+        //onclick="setTimeout(disableFunction, 1)"
+
 
         // global var ---- Clara code
         var gamestate = "";
@@ -370,10 +372,12 @@
                     }
                     clearInterval(loop);
                     gamestate = "game over";
-                    $('selector').click(true);
+
+                    $('#runButton').removeAttr('disabled');
                 } else {
-                    $('#runButton').text("Playing Game");
-                    $('#runButton').click(false);
+
+                    $('#runButton').text("Playing Game").attr("disabled","disabled");
+
                     $('#collide').html("");
                     //console.log("no ouchies")
                 }
@@ -451,11 +455,13 @@
                         }
                         clearInterval(loop);
                         gamestate = "game over";
-                        $('selector').click(true);
+
+                        $('#runButton').removeAttr('disabled');
                         return;
                     } else {
-                        $('#runButton').text("Playing Game");
-                        $('#runButton').click(false);
+
+                        $('#runButton').text("Playing Game").attr("disabled","disabled");
+
                     }
                 }
 
@@ -559,22 +565,23 @@
                 paintGrid();
                 paintSlinker();
                 // in event handler for run button --- Modified from Clara's suggestion
+                //https://stackoverflow.com/questions/1414365/disable-enable-an-input-with-jquery
 
                 if (! (gamestate === "playing")) {
                     gamestate = "playing";
-                    console.log("set gamestate to playing")
+                    console.log("set gamestate to playing");
 
-                    $('#runButton').text("Playing Game");
-                    $('#runButton').click(false);
+
+                    $('#runButton').text("Playing Game").attr("disabled","disabled");
+
 
                     loop = setInterval(moveSlinker, 180);
 
-
-
-//                } else {
+                } else {
+                    $('#runButton').removeAttr('disabled');
 
   //                  clearInterval(loop);
-  //                  gamestate = "game over";
+                    gamestate = "game over";
   //                  return;
                 }
 
@@ -594,7 +601,7 @@
         // the new scope (everything within drawModule is hidden from the outside world except what is returned).
         (function (drawModule) {
 
-            myButton.addEventListener("click", function () { drawModule.mainLoop(); document.getElementById("runButton").value= "Playing Game"; $('#runButton').click(false);});
+            myButton.addEventListener("click", function () { drawModule.mainLoop();  });
 
         }) (drawModule);
 
