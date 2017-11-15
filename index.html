@@ -259,33 +259,17 @@
             // generate one food item block
             var makeGoodFood = function () {
 
-                var min, max;
-                min = 1; max = w / slink_block_size;
-                goodFoodX[0] = Math.floor(Math.random() * (max - min)) + min;
-                min = 1; max = h / slink_block_size;
-                goodFoodY[0] = Math.floor(Math.random() * (max - min)) + min;
+                var min, max, pick;
+                min = 1; max = badFoodX.length;
+                pick = Math.floor(Math.random() * (max - min)) + min;
 
-                do {
-                    for(var i = 0; i < slinkerX.length; i++) {
-                        if (goodFoodX[0] === slinkerX[i] || goodFoodY[0] === slinkerY[i]) {
-                            min = 1; max = w / slink_block_size;
-                            goodFoodX[0] = Math.floor(Math.random() * (max - min)) + min;
-                            min = 1; max = h / slink_block_size;
-                            goodFoodY[0] = Math.floor(Math.random() * (max - min)) + min;
-                        }
-                        // add bug fix - check for match on existing badFood blocks
-                        for (var j = 0; j < badFoodCount; j++) {
-                            if (goodFoodX[0] === badFoodX[i] || goodFoodY[0] === badFoodY[i]) {
-                                min = 1; max = w / slink_block_size;
-                                goodFoodX[0] = Math.floor(Math.random() * (max - min)) + min;
-                                min = 1; max = h / slink_block_size;
-                                goodFoodY[0] = Math.floor(Math.random() * (max - min)) + min;
-                            }
-                        }
-                    }
+                // move badFood block to goodFood
+                goodFoodX[0] = badFoodX[pick];
+                goodFoodY[0] = badFoodY[pick];
 
-                } while ((goodFoodX[0] === slinkerX[i] && goodFoodY[0] === slinkerY[i]) ||
-                         (goodFoodX[0] === badFoodX[i] && goodFoodY[0] === badFoodY[i]));
+                // remove badFood block from array
+                badFoodX.splice(pick, 1);
+                badFoodY.splice(pick, 1);
 
                 console.log("leaving makeGoodFood: goodFoodX[0] = " + goodFoodX[0] + " goodFoodY[0] = " + goodFoodY[0]);
             };
@@ -322,8 +306,7 @@
                                 console.log("badFoodY = " + badFoodY[i]);
                                 amountMade++;
                         }
-                    } while ((badFoodX[i] === slinkerX[j] && badFoodY[i] === slinkerY[j])
-                          || (badFoodX[i] === goodFoodX[0] && badFoodY[i] === goodFoodY[0]) );
+                    } while ((badFoodX[i] === slinkerX[j] && badFoodY[i] === slinkerY[j]));
 
                     //console.log("leaving makeBadFood: badFoodX[i] = " + badFoodX[i] + " badFoodY[i] = " + badFoodY[i]);
 
@@ -607,9 +590,9 @@
                 direction = 'down';
                 setRunButton = false;
                 makeInitSlinker();
+                makeBadFood();
                 makeGoodFood();
                 paintGoodFood();
-                makeBadFood();
                 paintBadFood();
                 paintGrid();
                 paintSlinker();
