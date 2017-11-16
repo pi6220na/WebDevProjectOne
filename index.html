@@ -23,8 +23,8 @@
         .view_port {
 
             margin: auto;
-            width: 50%;
-            padding: 10px 0;
+            width: 60%;
+            padding: 1px;
             border: 3px solid green;
             text-align: center;
 
@@ -91,14 +91,12 @@
 
 </head>
 <body>
-
-
-
     <div class="view_port">
         <p class="numbers">Slitherin Slinker</p>
         <button class="messages" id="runButton" >RUN GAME</button>
         <p class="numbers"><span>SCORE: </span><span id="sLength"></span><span> High Score: </span><span id="high"></span></p>
         <p class="numbers"><span>Messages: </span><span id="collide"></span></p>
+        <p class="numbers"><span>X: </span><span id="x"></span><span> Y: </span><span id="y"></span></p>
     </div>
 
     <div>
@@ -245,6 +243,7 @@
 
             };
 
+            /*
             // draw slinker by passing x, y coordinates to the buildBlock function
             var paintSlinker = function(x, y) {
 
@@ -254,6 +253,7 @@
 
                 }
             };
+            */
 
             // fixed problem of disapearing food block, due to random coordinate off the canvas
             // generate one food item block
@@ -266,6 +266,8 @@
                 // move badFood block to goodFood
                 goodFoodX[0] = badFoodX[pick];
                 goodFoodY[0] = badFoodY[pick];
+
+                console.log("makeGoodFood removed badFoodX = " + badFoodX[pick] + " removed badFoodY = " + badFoodY[pick]);
 
                 // remove badFood block from array
                 badFoodX.splice(pick, 1);
@@ -300,9 +302,11 @@
 
                     do {
                         for(j = 0; j < slinkerX.length; j++) {
-                                badFoodX[i] = Math.floor(Math.random() * (maxX - min + 1)) + min;
+                                //badFoodX[i] = Math.floor(Math.random() * (maxX - min + 1)) + min;
+                                badFoodX[i] = Math.floor(Math.random() * (maxX - min)) + min;
                                 console.log("badFoodX = " + badFoodX[i]);
-                                badFoodY[i] = Math.floor(Math.random() * (maxY - min + 1)) + min;
+                                //badFoodY[i] = Math.floor(Math.random() * (maxY - min + 1)) + min;
+                                badFoodY[i] = Math.floor(Math.random() * (maxY - min)) + min;
                                 console.log("badFoodY = " + badFoodY[i]);
                                 amountMade++;
                         }
@@ -344,25 +348,25 @@
                 var headY = slinkerY[0] * slink_block_size;
 
                 if (direction === 'right') {
-                    if (headX >= w) {
+                    if (headX > w) {
                         headX = 0;
                         console.log("wrap rightside");
                     }
                 }
                 else if (direction === 'left') {
-                    if (headX <= 0) {
+                    if (headX < 0) {
                         headX = w;
                         console.log("wrap leftside");
                     }
                 }
                 else if (direction === 'up') {
-                    if (headY <= 0) {
+                    if (headY < 0) {
                         headY = h;
                         console.log("wrap topside");
                     }
                 }
                 else if (direction === 'down') {
-                    if (headY >= h) {
+                    if (headY > h) {
                         headY = 0;
                         console.log("wrap bottomside");
                     }
@@ -409,9 +413,10 @@
                     //console.log("no ouchies")
                 }
 
-                var offset = slink_block_size / 2;
-                // vertical grid lines
-                if (slinkerX[0] === goodFoodX[0]) {
+                var offset = slink_block_size / 2; // this offset shifts the gridline from edge to center of a block
+                // vertical grid line
+                if (slinkerX[0] === goodFoodX[0]) {     //if slinker head equals x coordinate of goodFood, change
+                                                        //color of line to show slinker on same coord as goodFood
                     console.log("slinkerX = " + slinkerX[0]);
                     console.log("goodFoodX = " + goodFoodX[0]);
                     console.log("w = " + w);
@@ -422,8 +427,9 @@
                     can.lineTo(goodFoodX[0]*slink_block_size+offset, w);
                     can.closePath();
                     can.stroke();
+                    $('#x').html(goodFoodX[0]);
 
-                } else {
+                } else {                                // slinker not on goodFood coordinate, color line black
 
                     can.strokeStyle="#000000";
                     can.beginPath();
@@ -431,12 +437,14 @@
                     can.lineTo(goodFoodX[0]*slink_block_size+offset, w);
                     can.closePath();
                     can.stroke();
-
+                    $('#x').html(goodFoodX[0]);
                 }
 
 
-                // horizontal grid lines
-                if (slinkerY[0] === goodFoodY[0]) {
+                // horizontal grid line
+                if (slinkerY[0] === goodFoodY[0]) {     //if slinker head equals y coordinate of goodFood, change
+                                                        //color of line to show slinker on same coord as goodFood
+
                     console.log("slinkerY = " + slinkerY[0]);
                     console.log("goodFoodY = " + goodFoodY[0]);
                     can.beginPath();
@@ -445,15 +453,15 @@
                     can.closePath();
                     can.strokeStyle = "#AA00FF";
                     can.stroke();
-
-                } else {
+                    $('#y').html(goodFoodY[0]);
+                } else {                                    // slinker not on goodFood coordinate, color line black
                     can.beginPath();
                     can.moveTo(0, goodFoodY[0]*slink_block_size+offset);
                     can.lineTo(w, goodFoodY[0]*slink_block_size+offset);
                     can.closePath();
                     can.strokeStyle = "#000000";
                     can.stroke();
-
+                    $('#y').html(goodFoodY[0]);
                 }
 
 
@@ -552,7 +560,7 @@
                 checkWallCollide();
 
 
-                // this code builds and draws slinker with a white colored head
+                // this code builds and draws slinker with a black colored head
                 colorWhite = true;
                 for(var i = 0; i < slinkerX.length; i++) {
                     //console.log("i = " + i + " slinkerX[i] = " + slinkerX[i] + " slinkerY[i] = " + slinkerY[i] + " colorWhite = " + colorWhite);
@@ -595,7 +603,7 @@
                 paintGoodFood();
                 paintBadFood();
                 paintGrid();
-                paintSlinker();
+                // paintSlinker();
                 // in event handler for run button --- Modified from Clara's suggestion
                 //https://stackoverflow.com/questions/1414365/disable-enable-an-input-with-jquery
 
