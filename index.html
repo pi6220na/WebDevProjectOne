@@ -214,30 +214,43 @@
 
                 console.log("entering makeGoodFood - badFoodX length = " + badFoodX.length);
 
-                var min, max, pick;
-                min = 1; max = badFoodX.length;
-                pick = Math.floor(Math.random() * (max - min)) + min;
+                var maxX, maxY;
+                var min = 1;
+                var x, y;
+                maxX = w / slink_block_size;
+                maxY = h / slink_block_size;
+                okToUse = false;
 
-                // move badFood block to goodFood
-                goodFoodX[0] = badFoodX[pick];
-                goodFoodY[0] = badFoodY[pick];
+                // generate random coordinates for bad food block. check against existing bad food block in array and
+                // check random against slinker coordinates.
 
-                console.log("makeGoodFood: pick = " + pick + " removed badFoodX = " + badFoodX[pick] + " removed badFoodY = " + badFoodY[pick]);
+                x = Math.floor(Math.random() * (maxX - min)) + min;
+                y = Math.floor(Math.random() * (maxY - min)) + min;
 
+                for (var i = 0; i < badFoodCount; i++) {
 
-                // remove badFood block from array
-                badFoodX.splice(pick, 1);
-                badFoodY.splice(pick, 1);
+                    do {
 
-                console.log("makeGoodFood - after splice... badFoodX length = " + badFoodX.length);
+                        var dupFood = checkDupBadFood(x, y);
+                        var dupSlink = checkDupSlinker(x, y);
 
-                console.log("leaving makeGoodFood: goodFoodX[0] = " + goodFoodX[0] + " goodFoodY[0] = " + goodFoodY[0]);
-                for (i = 0; i < badFoodX.length; i++) {
+                        if (!dupFood && !dupSlink) {
+                            okToUse = true;
+                        } else {
+                            okToUse = false;
+                        }
 
-                    console.log("makeGoodFood: badFoodX[i] = " + badFoodX[i] + " badFoodY[i] = " + badFoodY[i]);
+                    } while (dupFood || dupSlink);
+
+                    if (okToUse) {
+                        goodFoodX[0] = x;
+                        goodFoodY[0] = y;
+                    } else {
+                        x = Math.floor(Math.random() * (maxX - min)) + min;
+                        y = Math.floor(Math.random() * (maxY - min)) + min;
+                    }
 
                 }
-
             };
 
             // draw the good food
@@ -252,47 +265,79 @@
             var makeBadFood = function () {
 
 
-                //    subtle bug... can generate duplicate locations...
+                //    subtle bug... could generate duplicate locations with old code...
+                //    this is makeBadFood Mark II Version 3.2.1234
 
 
-                var maxX, maxY, amountMade = 0;
+                var maxX, maxY;
                 var min = 1;
-                var tX, tY;
-                //maxX = w / slink_block_size;
-                //maxY = h / slink_block_size;
+                var x, y;
+                var firstTime = true;
                 maxX = w / slink_block_size;
                 maxY = h / slink_block_size;
-                badFoodX = [];
-                badFoodY = [];
 
-                var testObject = [];
+                x = Math.floor(Math.random() * (maxX - min)) + min;
+                y = Math.floor(Math.random() * (maxY - min)) + min;
 
-                for (i = 0; i < badFoodCount; i++) {
+
+                // generate random coordinates for bad food block. check against existing bad food block in array and
+                // check random against slinker coordinates.
+                if (firstTime) {
+                    firstTime = false;
+                    badFoodX[0] = x;
+                    badFoodY[0] = y;
+                }
+
+                for (var i = 1; i < badFoodCount; i++) {
+
+                    console.log('in add loop   badFoodCount = ' + badFoodCount + ' length = ' + badFoodX.length);
+
+                    x = Math.floor(Math.random() * (maxX - min)) + min;
+                    y = Math.floor(Math.random() * (maxY - min)) + min;
+
+                    var dupFood = checkDupBadFood(x, y);
+                    var dupSlink = checkDupSlinker(x, y);
 
                     do {
-                        for(j = 0; j < slinkerX.length; j++) {
-                                //badFoodX[i] = Math.floor(Math.random() * (maxX - min + 1)) + min;
-                                badFoodX[i] = Math.floor(Math.random() * (maxX - min)) + min;
-                                console.log("badFoodX = " + badFoodX[i]);
-                                //badFoodY[i] = Math.floor(Math.random() * (maxY - min + 1)) + min;
-                                badFoodY[i] = Math.floor(Math.random() * (maxY - min)) + min;
-                                console.log("badFoodY = " + badFoodY[i]);
-                                amountMade++;
-
-                                testObject[i] = {x:badFoodX[i],y:badFoodY[i]};
-
+                        x = Math.floor(Math.random() * (maxX - min)) + min;
+                        y = Math.floor(Math.random() * (maxY - min)) + min;
+                        dupFood = checkDupBadFood(x, y);
+                        dupSlink = checkDupSlinker(x, y);
+                        if (!dupFood && !dupSlink) {
+                            badFoodX[i] = x;
+                            badFoodY[i] = y;
+                            console.log('adding to badFood array' + badFoodX[i] + ' ' + badFoodY[i]);
                         }
-                    } while ((badFoodX[i] === slinkerX[j] && badFoodY[i] === slinkerY[j]));
-
-                    //console.log("leaving makeBadFood: badFoodX[i] = " + badFoodX[i] + " badFoodY[i] = " + badFoodY[i]);
-
+                    } while (dupFood || dupSlink);
                 }
-                //console.log("leaving makeBadFood amountMade = " + amountMade);
-                for (i = 0; i < testObject.length; i++) {
-                    for (item in testObject[i]) {
-                        console.log("leaving makeBadFood testObject item = " + item + " testObject = " + testObject[i][item]);
+
+                console.log('leaving makeBadFood..............length = ' + badFoodX.length);
+
+            };
+
+            var checkDupBadFood = function(x,y) {
+                var dup = false;
+                for (i = 0; i < badFoodX.length; i++) {
+                    if (badFoodX[i] === x && badFoodY[i] === y) {
+                        console.log('returning true');
+                        dup = true;
                     }
                 }
+
+                console.log('in checkDupBadFood  dup = ' + dup);
+                return dup;
+            };
+
+            var checkDupSlinker = function(x,y) {
+                var dup = false;
+                for (i = 0; i < slinkerX.length; i++) {
+                    if (slinkerX[i] === x && slinkerY[i === y]) {
+                        console.log('returning true');
+                        dup = true;
+                    }
+                }
+                console.log('in checkDupSlinker  dup = ' + dup);
+                return dup;
             };
 
             // draw the bad blocks
@@ -372,7 +417,7 @@
                 }
 
                 if (collision) {
-                    $('#collide').html("OUCHIES");
+                    $('#collide').html("HEY, DON'T DO THAT");
                     $('#runButton').text("RUN GAME");
                     setRunButton = true;
                     if (slinkerX.length > highSscore) {
@@ -455,7 +500,7 @@
                 if (testX === goodFoodX[0] && testY === goodFoodY[0]) {
                     makeGoodFood();
                     return;
-                    // by returning here we don't remove "pop" the last block off slinker, therefore slinker
+                    // by returning here we don't remove or "pop" the last block off slinker, therefore slinker
                     // will grow by one block
                 }
 
@@ -550,7 +595,6 @@
                     buildBlock(slinkerX[i], slinkerY[i]);
                 }
 
-                paintGrid();
 
                 // shows how many blocks the slinker is getting
                 if (!setRunButton) {
