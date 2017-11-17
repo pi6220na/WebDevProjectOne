@@ -1,0 +1,688 @@
+<!-- Web Development MCTC Project One
+     Jeremy Wolfe
+     October 10, 2017
+
+     A "snake" game implemented in HTML, CSS, and Javascipt.
+
+     The programming is moduled on the following example:
+     http://www.competa.com/blog/how-to-build-a-snake-game-using-javascript-and-html5-canvas/
+     The game layout, name, data structures, game play, and enhancements are my own.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>Slinker, the Game</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Black Ops One|Creepster|Bungee Shade' rel='stylesheet'>
+
+    <style>
+        .view_port {
+
+            margin: auto;
+            width: 60%;
+            padding: 1px;
+            border: 3px solid green;
+            text-align: center;
+
+        }
+
+        #canvas {
+            background-color: lightgrey;
+            border-width: 3px;
+            border-color:  green;
+            /*transition: all 25.5s ease-in-out;
+             animation:spin 60s linear infinite;
+            animation: wiggle 20s linear infinite; */
+            animation: wobble 30s ease infinite;
+            opacity:0.85;
+        }
+
+        /* https://stackoverflow.com/questions/16771225/css3-rotate-animation */
+        /* @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } } */
+        @keyframes wobble { 0% { transform:rotate(45deg); } 50% { transform:rotate(-45deg); } 100% { transform:rotate(45deg); }}
+
+
+        p {
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Bungee Shade', cursive;font-size: 46px;
+            background: -webkit-linear-gradient(green, red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .numbers {
+            font-family: 'Creepster', cursive;font-size: 26px;
+        }
+
+        .messages {
+            font-family: 'Creepster', cursive;font-size: 16px;
+            color: red;
+        }
+
+        span#sLength {
+            display: inline-block;
+            width: 50px;
+            background-color: aqua;
+        }
+        span#high {
+            display: inline-block;
+            width: 50px;
+            background-color: aqua;
+        }
+
+        /*
+        #canvas:hover {
+            -webkit-transform : rotate(66deg);
+            -moz-transform : rotate(66deg);
+            -ms-transform : rotate(66deg);
+            -o-transform : rotate(66deg);
+            transform : rotate(365deg);
+        }
+        */
+
+    </style>
+
+</head>
+<body>
+<div class="view_port">
+    <p class="numbers">Slitherin Slinker</p>
+    <button class="messages" id="runButton" name="startstop">RUN GAME</button>
+    <p class="numbers"><span>SCORE: </span><span id="sLength"></span><span> High Score: </span><span id="high"></span></p>
+    <p class="numbers"><span>Messages: </span><span id="collide"></span></p>
+    <p class="numbers"><span>X: </span><span id="x"></span><span> Y: </span><span id="y"></span></p>
+</div>
+
+<div>
+    <p></p>
+</div>
+
+<div class="view_port">
+
+    <canvas id="canvas" height="400" width="600" style="border-top:8px solid green;"></canvas>
+
+</div>
+
+
+<script>
+    //onclick="setTimeout(disableFunction, 1)"
+
+
+    // global var ---- Clara code
+    let gamestate = "";
+
+
+    // attach an event listener to the keydown event
+    addEventListener("keydown", function(event) {
+        switch(event.keyCode) {
+
+            case 37:
+                if (direction !== 'right') {
+                    direction = 'left';
+                }
+                break;
+
+            case 39:
+                if (direction !== 'left') {
+                    direction = 'right';
+                }
+                break;
+
+            case 38:
+                if (direction !== 'down') {
+                    direction = 'up';
+                }
+                break;
+
+            case 40:
+                if (direction !== 'up') {
+                    direction = 'down';
+                }
+                break;
+        }
+    });
+
+    // using Module design pattern: https://toddmotto.com/mastering-the-module-pattern/
+    // this link provides an excellent overview!
+
+    // Most functionality is contained within the drawModule function. The methods (functions) within it
+    // are "private", or as private as can be accomplished with Javascript.
+    var drawModule = (function () {
+
+        // "global" variables within the drawModule context
+        var slinkerX = [];
+        var slinkerY = [];
+        var goodFoodX = [];
+        var goodFoodY = [];
+        var badFoodX = [];
+        var badFoodY = [];
+        var slink_block_size = 20;
+        var block_size = 20;
+        var can = canvas.getContext('2d');
+        var h = 400;
+        var w = 600;
+        var gridH = [];
+        var gridW = [];
+        var badFoodCount = 20;
+        var colorWhite = true;
+        var setRunButton = false;    // was true
+        var highSscore = 0;
+        var collision = false;
+
+        // this method makes the initial 4 block long slinker
+        var makeInitSlinker = function() {
+            var length = 8;
+            for (var i = 0 ; i < length; i++) {
+                //console.log("var i = " + i);
+                //console.log("slinkerX[i] = " + slinkerX[i]);
+                //console.log("slinkerY[i] = " + slinkerY[i]);
+                slinkerX.push(i);
+                slinkerY.push(0);
+            }
+
+        };
+
+
+        // draw a white block (if first call) or blue block at location based on passed in parameters
+        var buildBlock = function(x, y) {
+
+            //console.log("entering buildBlock ... colorWhite value is " + colorWhite);
+
+            if (colorWhite) {
+                can.fillStyle = 'black';
+                colorWhite = false;
+            } else {
+                can.fillStyle = 'blue';
+            }
+
+            can.fillRect(x * slink_block_size, y * slink_block_size, slink_block_size, slink_block_size);
+
+        };
+
+
+
+        // fixed problem of disapearing food block, due to random coordinate off the canvas
+        // generate one food item block
+        var makeGoodFood = function () {
+
+            console.log("entering makeGoodFood - badFoodX length = " + badFoodX.length);
+
+            var maxX, maxY;
+            var min = 1;
+            var x, y;
+            maxX = w / slink_block_size;
+            maxY = h / slink_block_size;
+            okToUse = false;
+
+            // generate random coordinates for bad food block. check against existing bad food block in array and
+            // check random against slinker coordinates.
+
+            x = Math.floor(Math.random() * (maxX - min)) + min;
+            y = Math.floor(Math.random() * (maxY - min)) + min;
+
+            for (var i = 0; i < badFoodCount; i++) {
+
+                do {
+
+                    var dupFood = checkDupBadFood(x, y);
+                    var dupSlink = checkDupSlinker(x, y);
+
+                    if (!dupFood && !dupSlink) {
+                        okToUse = true;
+                    } else {
+                        okToUse = false;
+                    }
+
+                } while (dupFood || dupSlink);
+
+                if (okToUse) {
+                    goodFoodX[0] = x;
+                    goodFoodY[0] = y;
+                } else {
+                    x = Math.floor(Math.random() * (maxX - min)) + min;
+                    y = Math.floor(Math.random() * (maxY - min)) + min;
+                }
+
+            }
+        };
+
+        // draw the good food
+        var paintGoodFood = function () {
+
+            can.fillStyle = 'red';
+            can.fillRect(goodFoodX[0] * slink_block_size, goodFoodY[0] * slink_block_size, slink_block_size, slink_block_size);
+        };
+
+
+        // randomly generate badFoodCount number of blocks
+        var makeBadFood = function () {
+
+
+            //    subtle bug... could generate duplicate locations with old code...
+            //    this is makeBadFood Mark II Version 3.2.1234
+
+
+            var maxX, maxY;
+            var min = 1;
+            var x, y;
+            var firstTime = true;
+            maxX = w / slink_block_size;
+            maxY = h / slink_block_size;
+
+            x = Math.floor(Math.random() * (maxX - min)) + min;
+            y = Math.floor(Math.random() * (maxY - min)) + min;
+
+
+            // generate random coordinates for bad food block. check against existing bad food block in array and
+            // check random against slinker coordinates.
+            if (firstTime) {
+                firstTime = false;
+                badFoodX[0] = x;
+                badFoodY[0] = y;
+            }
+
+            for (var i = 1; i < badFoodCount; i++) {
+
+                console.log('in add loop   badFoodCount = ' + badFoodCount + ' length = ' + badFoodX.length);
+
+                x = Math.floor(Math.random() * (maxX - min)) + min;
+                y = Math.floor(Math.random() * (maxY - min)) + min;
+
+                var dupFood = checkDupBadFood(x, y);
+                var dupSlink = checkDupSlinker(x, y);
+
+                do {
+                    x = Math.floor(Math.random() * (maxX - min)) + min;
+                    y = Math.floor(Math.random() * (maxY - min)) + min;
+                    dupFood = checkDupBadFood(x, y);
+                    dupSlink = checkDupSlinker(x, y);
+                    if (!dupFood && !dupSlink) {
+                        badFoodX[i] = x;
+                        badFoodY[i] = y;
+                        console.log('adding to badFood array' + badFoodX[i] + ' ' + badFoodY[i]);
+                    }
+                } while (dupFood || dupSlink);
+            }
+
+            console.log('leaving makeBadFood..............length = ' + badFoodX.length);
+
+        };
+
+        var checkDupBadFood = function(x,y) {
+            var dup = false;
+            for (i = 0; i < badFoodX.length; i++) {
+                if (badFoodX[i] === x && badFoodY[i] === y) {
+                    console.log('returning true');
+                    dup = true;
+                }
+            }
+
+            console.log('in checkDupBadFood  dup = ' + dup);
+            return dup;
+        };
+
+        var checkDupSlinker = function(x,y) {
+            var dup = false;
+            for (i = 0; i < slinkerX.length; i++) {
+                if (slinkerX[i] === x && slinkerY[i === y]) {
+                    console.log('returning true');
+                    dup = true;
+                }
+            }
+            console.log('in checkDupSlinker  dup = ' + dup);
+            return dup;
+        };
+
+        // draw the bad blocks
+        var paintBadFood = function () {
+
+            for (i = 0; i < badFoodX.length; i++) {
+                //console.log("starting paintBadFood badFoodCount = " + badFoodCount + "bfX[i] = " + badFoodX[i]
+                //    + "bfY[i] = " + badFoodY[i] + "slink_block_size = " + slink_block_size);
+
+                can.fillStyle = 'green';
+                can.fillRect(badFoodX[i] * slink_block_size, badFoodY[i] * slink_block_size, slink_block_size, slink_block_size);
+                if (badFoodX[i] === goodFoodX[0] && badFoodY[i] === goodFoodY[0]) {
+                    console.log("Whoah.... not working, i = " + i + "badfood X Y[i] = " + badFoodX[i] + "," + badFoodY[i] + "goodFood X Y[0] = " + goodFoodX[0] + "," + goodFoodY[0]);
+                    gamestate = "game over";
+                    $('#runButton').text("RUN GAME");
+                    $('#runButton').removeAttr('disabled');
+                    gamestate = "game over";
+                    clearInterval(loop);
+                    return;
+                }
+            }
+        };
+
+
+
+        // test for collision with outside edge "wall", wrap to opposite side if collision
+        var checkWallCollide = function() {
+
+            // convert slinker coordinates to screen coordinates
+            var headX = slinkerX[0] * slink_block_size;
+            var headY = slinkerY[0] * slink_block_size;
+
+            if (direction === 'right') {
+                if (headX > w) {
+                    headX = 0;
+                    console.log("wrap rightside");
+                }
+            }
+            else if (direction === 'left') {
+                if (headX < 0) {
+                    headX = w;
+                    console.log("wrap leftside");
+                }
+            }
+            else if (direction === 'up') {
+                if (headY < 0) {
+                    headY = h;
+                    console.log("wrap topside");
+                }
+            }
+            else if (direction === 'down') {
+                if (headY > h) {
+                    headY = 0;
+                    console.log("wrap bottomside");
+                }
+            }
+
+            // convert back from screen coordinates to slinker coordinates
+            slinkerX[0] = headX / slink_block_size;
+            slinkerY[0] = headY / slink_block_size;
+            console.log("leaving checkWallCollide");
+
+        };
+
+
+
+        // checks to see if head of slinker has run into its body
+        var checkCollideSelf = function () {
+
+            var testX = slinkerX[0];
+            var testY = slinkerY[0];
+            for(var i = 1; i < slinkerX.length; i++) {
+
+                if (testX === slinkerX[i] && testY === slinkerY[i]) {
+                    collision = true;
+                }
+            }
+
+            if (collision) {
+                $('#collide').html("HEY, DON'T DO THAT");
+
+                console.log("THIS SHOULD BE WORKING");
+
+                $('#runButton').text("RUN GAME");
+                setRunButton = true;
+                if (slinkerX.length > highSscore) {
+                    highSscore = slinkerX.length;
+                    $('#high').html(highSscore);
+                }
+
+                gamestate = "game over";
+
+                $('#runButton').removeAttr('disabled');
+
+                clearInterval(loop);
+
+                return;
+
+            } else {
+
+                $('#runButton').text("Playing Game").attr("disabled","disabled");
+
+
+                $('#collide').html("");
+                //console.log("no ouchies")
+            }
+
+            var offset = slink_block_size / 2; // this offset shifts the gridline from edge to center of a block
+            // vertical grid line
+            if (slinkerX[0] === goodFoodX[0]) {     //if slinker head equals x coordinate of goodFood, change
+                //color of line to show slinker on same coord as goodFood
+                console.log("slinkerX = " + slinkerX[0]);
+                console.log("goodFoodX = " + goodFoodX[0]);
+                console.log("w = " + w);
+
+                can.strokeStyle="#AA00FF";
+                can.beginPath();
+                can.moveTo(goodFoodX[0]*slink_block_size+offset, 0);
+                can.lineTo(goodFoodX[0]*slink_block_size+offset, w);
+                can.closePath();
+                can.stroke();
+                $('#x').html(goodFoodX[0]);
+
+            } else {                                // slinker not on goodFood coordinate, color line black
+
+                can.strokeStyle="#000000";
+                can.beginPath();
+                can.moveTo(goodFoodX[0]*slink_block_size+offset, 0);
+                can.lineTo(goodFoodX[0]*slink_block_size+offset, w);
+                can.closePath();
+                can.stroke();
+                $('#x').html(goodFoodX[0]);
+            }
+
+
+            // horizontal grid line
+            if (slinkerY[0] === goodFoodY[0]) {     //if slinker head equals y coordinate of goodFood, change
+                //color of line to show slinker on same coord as goodFood
+
+                console.log("slinkerY = " + slinkerY[0]);
+                console.log("goodFoodY = " + goodFoodY[0]);
+                can.beginPath();
+                can.moveTo(0, goodFoodY[0]*slink_block_size+offset);
+                can.lineTo(w, goodFoodY[0]*slink_block_size+offset);
+                can.closePath();
+                can.strokeStyle = "#AA00FF";
+                can.stroke();
+                $('#y').html(goodFoodY[0]);
+            } else {                                    // slinker not on goodFood coordinate, color line black
+                can.beginPath();
+                can.moveTo(0, goodFoodY[0]*slink_block_size+offset);
+                can.lineTo(w, goodFoodY[0]*slink_block_size+offset);
+                can.closePath();
+                can.strokeStyle = "#000000";
+                can.stroke();
+                $('#y').html(goodFoodY[0]);
+            }
+
+
+        };
+
+        // checks to see if slinker has run into a green badFood block
+        var checkBadCollide = function () {
+
+            var testX = slinkerX[0];
+            var testY = slinkerY[0];
+            if (testX === goodFoodX[0] && testY === goodFoodY[0]) {
+                makeGoodFood();
+                return;
+                // by returning here we don't remove or "pop" the last block off slinker, therefore slinker
+                // will grow by one block
+            }
+
+
+            for (i = 0; i < badFoodX.length; i++) {
+                if (testX === badFoodX[i] && testY === badFoodY[i]) {
+                    $('#collide').html("OUCHIES");
+
+                    $('#runButton').text("RUN GAME");
+                    setRunButton = true;
+                    if (slinkerX.length > highSscore) {
+                        highSscore = slinkerX.length;
+                        $('#high').html(highSscore);
+                    }
+
+                    gamestate = "game over";
+
+                    $('#runButton').removeAttr('disabled');
+
+                    clearInterval(loop);
+
+                    return;
+                } else {
+
+                    $('#runButton').text("Playing Game").attr("disabled","disabled");
+
+                }
+            }
+
+
+            slinkerX.pop();
+            slinkerY.pop();
+
+        };
+
+
+        var counter = 0;
+        // main game loop -
+        //    clears the canvas, repaints good and bad food, determines direction slinker heading,
+        //    checks for collisions with self or bad food
+        var moveSlinker = function() {
+
+            counter++;
+
+            // reset canvas to light grey
+            can.fillStyle = 'lightgrey';
+            can.fillRect(0, 0, w, h);
+
+            // draw the food item
+            paintGoodFood();
+            paintBadFood();
+
+            var headX = slinkerX[0];
+            var headY = slinkerY[0];
+
+            if (direction === 'right') {
+                headX++;
+            }
+            else if (direction === 'left') {
+                headX--;
+            }
+            else if (direction === 'up') {
+                headY--;
+            }
+            else if (direction === 'down') {
+                headY++;
+            }
+
+            collision = false;
+            checkCollideSelf();
+
+            // check for collision of head of slinker with food item
+            checkBadCollide();
+
+            // testing code, adds a block to the end of slinker every 10 intervals
+            /*
+            if (!(counter % 10 === 0)) {
+                slinkerX.pop();
+                slinkerY.pop();
+            }
+            */
+
+            // puts updated x/y coordinates on "front" of array
+            slinkerX.unshift(headX);
+            slinkerY.unshift(headY);
+
+
+            checkWallCollide();
+
+
+            // this code builds and draws slinker with a black colored head
+            colorWhite = true;
+            for(var i = 0; i < slinkerX.length; i++) {
+                //console.log("i = " + i + " slinkerX[i] = " + slinkerX[i] + " slinkerY[i] = " + slinkerY[i] + " colorWhite = " + colorWhite);
+                buildBlock(slinkerX[i], slinkerY[i]);
+            }
+
+
+            // shows how many blocks the slinker is getting
+            if (!setRunButton) {
+                $('#sLength').html(slinkerX.length);
+                if (slinkerX.length > highSscore) {
+                    highSscore = slinkerX.length;
+                    $('#high').html(highSscore);
+                }
+            }
+
+            /*
+            console.log("counter =  " + counter);
+            if (counter > 25) {
+                clearInterval(loop);
+            }
+            */
+
+        };
+
+
+
+        // this sets up everything and kicks off the loop setInterval which causes the moveSlinker method
+        // to execute every 180 milliseconds (.18 seconds)
+        var mainLoop = function() {
+            slinkerX = [];
+            slinkerY = [];
+            goodFoodX = [];
+            goodFoodY = [];
+            direction = 'down';
+            setRunButton = false;
+            gamestate = "game over";
+            makeInitSlinker();
+            makeBadFood();
+            makeGoodFood();
+            paintGoodFood();
+            paintBadFood();
+            // paintSlinker();
+
+            // in event handler for run button --- Modified from Clara's suggestion
+            //https://stackoverflow.com/questions/1414365/disable-enable-an-input-with-jquery
+            if (! (gamestate === "playing")) {
+                gamestate = "playing";
+                console.log("set gamestate to playing");
+
+
+                $('#runButton').text("Playing Game").attr("disabled","disabled");
+
+
+                loop = setInterval(moveSlinker, 180);
+
+            } else {
+                $('#runButton').removeAttr('disabled');
+
+                //                  clearInterval(loop);
+                gamestate = "game over";
+                //                  return;
+            }
+
+        };
+
+        return {
+            mainLoop : mainLoop
+        };
+
+    })();
+
+    // a true global variable
+    var myButton = document.getElementById('runButton');
+
+    // this IIFE (immediately invoked function expression) function runs once when first parsed by Javascript compiler
+    // and kicks off the run game drawModule, as well as hooking up the myButton event listener, as well as creating
+    // the new scope (everything within drawModule is hidden from the outside world except what is returned).
+    (function (drawModule) {
+
+        myButton.addEventListener("click", function () { drawModule.mainLoop();  });
+
+    }) (drawModule);
+
+</script>
+
+</body>
+</html>
