@@ -93,7 +93,7 @@
 <body>
 <div class="view_port">
     <p class="numbers">Slitherin Slinker</p>
-    <button class="messages" id="runButton" name="startstop">RUN GAME</button>
+    <button class="messages" id="runButton" name="myButton">RUN GAME</button>
     <p class="numbers"><span>SCORE: </span><span id="sLength"></span><span> High Score: </span><span id="high"></span></p>
     <p class="numbers"><span>Messages: </span><span id="collide"></span></p>
     <p class="numbers"><span>X: </span><span id="x"></span><span> Y: </span><span id="y"></span></p>
@@ -211,7 +211,7 @@
         // generate one food item block
         var makeGoodFood = function () {
 
-            console.log("entering makeGoodFood - badFoodX length = " + badFoodX.length);
+         //   console.log("entering makeGoodFood - badFoodX length = " + badFoodX.length);
 
             var maxX, maxY;
             var min = 1;
@@ -289,7 +289,7 @@
 
             for (var i = 1; i < badFoodCount; i++) {
 
-                console.log('in add loop   badFoodCount = ' + badFoodCount + ' length = ' + badFoodX.length);
+                //console.log('in add loop   badFoodCount = ' + badFoodCount + ' length = ' + badFoodX.length);
 
                 x = Math.floor(Math.random() * (maxX - min)) + min;
                 y = Math.floor(Math.random() * (maxY - min)) + min;
@@ -305,12 +305,12 @@
                     if (!dupFood && !dupSlink) {
                         badFoodX[i] = x;
                         badFoodY[i] = y;
-                        console.log('adding to badFood array' + badFoodX[i] + ' ' + badFoodY[i]);
+                  //      console.log('adding to badFood array' + badFoodX[i] + ' ' + badFoodY[i]);
                     }
                 } while (dupFood || dupSlink);
             }
 
-            console.log('leaving makeBadFood..............length = ' + badFoodX.length);
+           // console.log('leaving makeBadFood..............length = ' + badFoodX.length);
 
         };
 
@@ -318,12 +318,12 @@
             var dup = false;
             for (i = 0; i < badFoodX.length; i++) {
                 if (badFoodX[i] === x && badFoodY[i] === y) {
-                    console.log('returning true');
+                    //console.log('returning true');
                     dup = true;
                 }
             }
 
-            console.log('in checkDupBadFood  dup = ' + dup);
+            //console.log('in checkDupBadFood  dup = ' + dup);
             return dup;
         };
 
@@ -331,11 +331,11 @@
             var dup = false;
             for (i = 0; i < slinkerX.length; i++) {
                 if (slinkerX[i] === x && slinkerY[i === y]) {
-                    console.log('returning true');
+                    //console.log('returning true');
                     dup = true;
                 }
             }
-            console.log('in checkDupSlinker  dup = ' + dup);
+            //console.log('in checkDupSlinker  dup = ' + dup);
             return dup;
         };
 
@@ -349,18 +349,69 @@
                 can.fillStyle = 'green';
                 can.fillRect(badFoodX[i] * slink_block_size, badFoodY[i] * slink_block_size, slink_block_size, slink_block_size);
                 if (badFoodX[i] === goodFoodX[0] && badFoodY[i] === goodFoodY[0]) {
-                    console.log("Whoah.... not working, i = " + i + "badfood X Y[i] = " + badFoodX[i] + "," + badFoodY[i] + "goodFood X Y[0] = " + goodFoodX[0] + "," + goodFoodY[0]);
+
                     gamestate = "game over";
-                    $('#runButton').text("RUN GAME");
-                    $('#runButton').removeAttr('disabled');
-                    gamestate = "game over";
-                    clearInterval(loop);
+                    checkState("paintBadFood");
+
                     return;
                 }
             }
         };
 
+        var checkState = function(caller) {
+            //console.log();
 
+            if (gamestate === "game over") {
+
+                if (caller === "paintBadFood") {
+                    console.log("Whoah.... not working, i = " + i + "badfood X Y[i] = " + badFoodX[i] + "," + badFoodY[i] + "goodFood X Y[0] = " + goodFoodX[0] + "," + goodFoodY[0]);
+                }
+
+                if (caller === "checkBadCollide") {
+
+                    $('#collide').html("OUCHIES");
+
+
+                }
+
+
+                $('#collide').html("HEY, DON'T DO THAT");
+                //console.log("THIS SHOULD BE WORKING");
+                //myButton.innerHTML='RUN GAME';
+                $('#runButton').text("RUN GAME");
+                setRunButton = true;
+                if (slinkerX.length > highSscore) {
+                    highSscore = slinkerX.length;
+                    $('#high').html(highSscore);
+                }
+                //console.log("before");
+                //console.log(myButton);
+                //    myButton.disabled = false;
+                myButton.removeAttribute("disabled", "disabled");
+                // $('#runButton').prop('disabled', true);
+                //console.log("after");
+        //        console.log(myButton);
+        //        var atts = myButton.attributes;
+        //        console.log(atts);
+                //$('#runButton').prop('disabled', false);
+                clearInterval(loop);
+            } else {
+                setRunButton = false;
+                gamestate = "playing";
+                myButton.innerText='Playing Game';
+                myButton.disabled = true;
+                //console.log(myButton);
+
+                //$('#runButton').prop('disabled', true);
+
+                //$('#runButton').text("Playing Game").attr("disabled","disabled");
+
+
+                $('#collide').html("");
+                //console.log("no ouchies")
+            }
+
+        };
 
         // test for collision with outside edge "wall", wrap to opposite side if collision
         var checkWallCollide = function() {
@@ -372,32 +423,32 @@
             if (direction === 'right') {
                 if (headX > w) {
                     headX = 0;
-                    console.log("wrap rightside");
+                    //console.log("wrap rightside");
                 }
             }
             else if (direction === 'left') {
                 if (headX < 0) {
                     headX = w;
-                    console.log("wrap leftside");
+                    //console.log("wrap leftside");
                 }
             }
             else if (direction === 'up') {
                 if (headY < 0) {
                     headY = h;
-                    console.log("wrap topside");
+                    //console.log("wrap topside");
                 }
             }
             else if (direction === 'down') {
                 if (headY > h) {
                     headY = 0;
-                    console.log("wrap bottomside");
+                    //console.log("wrap bottomside");
                 }
             }
 
             // convert back from screen coordinates to slinker coordinates
             slinkerX[0] = headX / slink_block_size;
             slinkerY[0] = headY / slink_block_size;
-            console.log("leaving checkWallCollide");
+           // console.log("leaving checkWallCollide");
 
         };
 
@@ -416,41 +467,24 @@
             }
 
             if (collision) {
-                $('#collide').html("HEY, DON'T DO THAT");
-
-                console.log("THIS SHOULD BE WORKING");
-
-                $('#runButton').text("RUN GAME");
-                setRunButton = true;
-                if (slinkerX.length > highSscore) {
-                    highSscore = slinkerX.length;
-                    $('#high').html(highSscore);
-                }
 
                 gamestate = "game over";
-
-                $('#runButton').removeAttr('disabled');
-
-                clearInterval(loop);
-
+                checkState("checkCollideSelf");
                 return;
 
             } else {
 
-                $('#runButton').text("Playing Game").attr("disabled","disabled");
-
-
-                $('#collide').html("");
-                //console.log("no ouchies")
+                gamestate = "playing";
+                checkState("checkCollideSelf");
             }
 
             var offset = slink_block_size / 2; // this offset shifts the gridline from edge to center of a block
             // vertical grid line
             if (slinkerX[0] === goodFoodX[0]) {     //if slinker head equals x coordinate of goodFood, change
-                //color of line to show slinker on same coord as goodFood
-                console.log("slinkerX = " + slinkerX[0]);
-                console.log("goodFoodX = " + goodFoodX[0]);
-                console.log("w = " + w);
+                                                    //color of line to show slinker on same coord as goodFood
+                //console.log("slinkerX = " + slinkerX[0]);
+                //console.log("goodFoodX = " + goodFoodX[0]);
+                //console.log("w = " + w);
 
                 can.strokeStyle="#AA00FF";
                 can.beginPath();
@@ -476,8 +510,8 @@
             if (slinkerY[0] === goodFoodY[0]) {     //if slinker head equals y coordinate of goodFood, change
                 //color of line to show slinker on same coord as goodFood
 
-                console.log("slinkerY = " + slinkerY[0]);
-                console.log("goodFoodY = " + goodFoodY[0]);
+                //console.log("slinkerY = " + slinkerY[0]);
+                //console.log("goodFoodY = " + goodFoodY[0]);
                 can.beginPath();
                 can.moveTo(0, goodFoodY[0]*slink_block_size+offset);
                 can.lineTo(w, goodFoodY[0]*slink_block_size+offset);
@@ -513,26 +547,11 @@
 
             for (i = 0; i < badFoodX.length; i++) {
                 if (testX === badFoodX[i] && testY === badFoodY[i]) {
-                    $('#collide').html("OUCHIES");
-
-                    $('#runButton').text("RUN GAME");
-                    setRunButton = true;
-                    if (slinkerX.length > highSscore) {
-                        highSscore = slinkerX.length;
-                        $('#high').html(highSscore);
-                    }
 
                     gamestate = "game over";
-
-                    $('#runButton').removeAttr('disabled');
-
-                    clearInterval(loop);
+                    checkState("checkBadCollide");
 
                     return;
-                } else {
-
-                    $('#runButton').text("Playing Game").attr("disabled","disabled");
-
                 }
             }
 
@@ -646,7 +665,7 @@
             //https://stackoverflow.com/questions/1414365/disable-enable-an-input-with-jquery
             if (! (gamestate === "playing")) {
                 gamestate = "playing";
-                console.log("set gamestate to playing");
+                console.log("set gamestate to playing at bottom of mainloop");
 
 
                 $('#runButton').text("Playing Game").attr("disabled","disabled");
@@ -655,6 +674,8 @@
                 loop = setInterval(moveSlinker, 180);
 
             } else {
+                console.log("set gamestate to game over at bottom of mainloop");
+
                 $('#runButton').removeAttr('disabled');
 
                 //                  clearInterval(loop);
