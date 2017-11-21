@@ -223,30 +223,36 @@
             // generate random coordinates for bad food block. check against existing bad food block in array and
             // check random against slinker coordinates.
 
-            x = Math.floor(Math.random() * (maxX - min)) + min;
-            y = Math.floor(Math.random() * (maxY - min)) + min;
+            for (j = 0; j < badFoodCount; j++) {
 
-            for (var i = 0; i < badFoodCount; i++) {
+                x = Math.floor(Math.random() * (maxX - min)) + min;
+                y = Math.floor(Math.random() * (maxY - min)) + min;
 
-                do {
+                for (var i = 0; i < badFoodCount; i++) {
 
-                    var dupFood = checkDupBadFood(x, y);
-                    var dupSlink = checkDupSlinker(x, y);
+                    do {
 
-                    if (!dupFood && !dupSlink) {
-                        okToUse = true;
+                        var dupFood = checkDupBadFood(x, y);
+                        var dupSlink = checkDupSlinker(x, y);
+
+                        if (!dupFood && !dupSlink) {
+                            okToUse = true;
+                        } else {
+                            okToUse = false;
+                        }
+
+                    } while (dupFood || dupSlink);
+
+                    if (okToUse) {
+                        goodFoodX[j] = x;
+                        goodFoodY[j] = y;
                     } else {
-                        okToUse = false;
+                        x = Math.floor(Math.random() * (maxX - min)) + min;
+                        y = Math.floor(Math.random() * (maxY - min)) + min;
                     }
 
-                } while (dupFood || dupSlink);
-
-                if (okToUse) {
-                    goodFoodX[0] = x;
-                    goodFoodY[0] = y;
-                } else {
-                    x = Math.floor(Math.random() * (maxX - min)) + min;
-                    y = Math.floor(Math.random() * (maxY - min)) + min;
+                    okToUse = false;
+                    console.log('in makeGoodFood  j= ' + j);
                 }
 
             }
@@ -255,8 +261,10 @@
         // draw the good food
         var paintGoodFood = function () {
 
-            can.fillStyle = 'red';
-            can.fillRect(goodFoodX[0] * slink_block_size, goodFoodY[0] * slink_block_size, slink_block_size, slink_block_size);
+            for (var i = 0; i < badFoodCount; i++) {
+                can.fillStyle = 'red';
+                can.fillRect(goodFoodX[i] * slink_block_size, goodFoodY[i] * slink_block_size, slink_block_size, slink_block_size);
+            }
         };
 
 
@@ -476,6 +484,10 @@
 
                 gamestate = "playing";
                 checkState("checkCollideSelf");
+                if (slinkerX.length > highSscore) {
+                    highSscore = slinkerX.length;
+                    $('#high').html(highSscore);
+                }
             }
 
             var offset = slink_block_size / 2; // this offset shifts the gridline from edge to center of a block
@@ -537,13 +549,14 @@
 
             var testX = slinkerX[0];
             var testY = slinkerY[0];
-            if (testX === goodFoodX[0] && testY === goodFoodY[0]) {
-                makeGoodFood();
-                return;
-                // by returning here we don't remove or "pop" the last block off slinker, therefore slinker
-                // will grow by one block
+            for (var i = 0; i < badFoodCount; i++) {
+                if (testX === goodFoodX[i] && testY === goodFoodY[i]) {
+                    makeGoodFood();
+                    return;
+                    // by returning here we don't remove or "pop" the last block off slinker, therefore slinker
+                    // will grow by one block
+                }
             }
-
 
             for (i = 0; i < badFoodX.length; i++) {
                 if (testX === badFoodX[i] && testY === badFoodY[i]) {
@@ -670,6 +683,10 @@
 
                 $('#runButton').text("Playing Game").attr("disabled","disabled");
 
+                if (slinkerX.length > highSscore) {
+                    highSscore = slinkerX.length;
+                    $('#high').html(highSscore);
+                }
 
                 loop = setInterval(moveSlinker, 180);
 
