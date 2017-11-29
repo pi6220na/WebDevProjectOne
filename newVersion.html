@@ -111,12 +111,9 @@
 
 
 <script>
-    //onclick="setTimeout(disableFunction, 1)"
-
 
     // global var ---- Clara code
     let gamestate = "";
-
 
     // attach an event listener to the keydown event
     addEventListener("keydown", function(event) {
@@ -156,6 +153,7 @@
     var drawModule = (function () {
 
         // "global" variables within the drawModule context
+        var speed = 160;
         var slinkerX = [];
         var slinkerY = [];
         var goodFoodX = [];
@@ -170,6 +168,7 @@
         var gridH = [];
         var gridW = [];
         var badFoodCount = 20;
+        var goodFoodCount = 1;
         var colorWhite = true;
         var setRunButton = false;    // was true
         var highSscore = 0;
@@ -223,45 +222,44 @@
             // generate random coordinates for bad food block. check against existing bad food block in array and
             // check random against slinker coordinates.
 
-            for (j = 0; j < badFoodCount; j++) {
+            //for (j = 0; j < badFoodCount; j++) {
+            for (j = 0; j < goodFoodCount; j++) {
 
-                x = Math.floor(Math.random() * (maxX - min)) + min;
-                y = Math.floor(Math.random() * (maxY - min)) + min;
+                    x = calcRandom(min, maxX);
+                    y = calcRandom(min, maxY);
 
-                for (var i = 0; i < badFoodCount; i++) {
+                    for (var i = 0; i < badFoodCount; i++) {
 
-                    do {
+                        do {
 
-                        var dupFood = checkDupBadFood(x, y);
-                        var dupSlink = checkDupSlinker(x, y);
+                            // checks for duplicated/matched coordinates
+                            var dupFood = checkDupBadFood(x, y);
+                            var dupSlink = checkDupSlinker(x, y);
 
-                        if (!dupFood && !dupSlink) {
-                            okToUse = true;
+                            // set to true or false based on both dupfood and dupslink are false meaning not duplicated
+                            okToUse = (!dupFood && !dupSlink);
+
+                        } while (dupFood || dupSlink);
+
+                        if (okToUse) {
+                            goodFoodX[j] = x;
+                            goodFoodY[j] = y;
                         } else {
-                            okToUse = false;
+                            x = calcRandom(min, maxX);
+                            y = calcRandom(min, maxY);
                         }
 
-                    } while (dupFood || dupSlink);
-
-                    if (okToUse) {
-                        goodFoodX[j] = x;
-                        goodFoodY[j] = y;
-                    } else {
-                        x = Math.floor(Math.random() * (maxX - min)) + min;
-                        y = Math.floor(Math.random() * (maxY - min)) + min;
+                        okToUse = false;
+                        //console.log('in makeGoodFood  j= ' + j);
                     }
-
-                    okToUse = false;
-                    console.log('in makeGoodFood  j= ' + j);
-                }
-
             }
         };
 
         // draw the good food
         var paintGoodFood = function () {
 
-            for (var i = 0; i < badFoodCount; i++) {
+            //for (var i = 0; i < badFoodCount; i++) {
+            for (var i = 0; i < goodFoodCount; i++) {
                 can.fillStyle = 'red';
                 can.fillRect(goodFoodX[i] * slink_block_size, goodFoodY[i] * slink_block_size, slink_block_size, slink_block_size);
             }
@@ -270,12 +268,8 @@
 
         // randomly generate badFoodCount number of blocks
         var makeBadFood = function () {
-
-
             //    subtle bug... could generate duplicate locations with old code...
             //    this is makeBadFood Mark II Version 3.2.1234
-
-
             var maxX, maxY;
             var min = 1;
             var x, y;
@@ -283,8 +277,8 @@
             maxX = w / slink_block_size;
             maxY = h / slink_block_size;
 
-            x = Math.floor(Math.random() * (maxX - min)) + min;
-            y = Math.floor(Math.random() * (maxY - min)) + min;
+            x = calcRandom(min, maxX);
+            y = calcRandom(min, maxY);
 
 
             // generate random coordinates for bad food block. check against existing bad food block in array and
@@ -299,15 +293,15 @@
 
                 //console.log('in add loop   badFoodCount = ' + badFoodCount + ' length = ' + badFoodX.length);
 
-                x = Math.floor(Math.random() * (maxX - min)) + min;
-                y = Math.floor(Math.random() * (maxY - min)) + min;
+                x = calcRandom(min, maxX);
+                y = calcRandom(min, maxY);
 
                 var dupFood = checkDupBadFood(x, y);
                 var dupSlink = checkDupSlinker(x, y);
 
                 do {
-                    x = Math.floor(Math.random() * (maxX - min)) + min;
-                    y = Math.floor(Math.random() * (maxY - min)) + min;
+                    x = calcRandom(min, maxX);
+                    y = calcRandom(min, maxY);
                     dupFood = checkDupBadFood(x, y);
                     dupSlink = checkDupSlinker(x, y);
                     if (!dupFood && !dupSlink) {
@@ -320,6 +314,11 @@
 
            // console.log('leaving makeBadFood..............length = ' + badFoodX.length);
 
+        };
+
+        // calculate a random number between min/max values passed in
+        var calcRandom = function(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
         };
 
         var checkDupBadFood = function(x,y) {
@@ -366,6 +365,7 @@
             }
         };
 
+        // check for game over state change and set button/fields accordingly
         var checkState = function(caller) {
             //console.log();
 
@@ -376,47 +376,25 @@
                 }
 
                 if (caller === "checkBadCollide") {
-
                     $('#collide').html("OUCHIES");
-
-
+                } else {
+                    $('#collide').html("HEY, DON'T DO THAT");
                 }
 
-
-                $('#collide').html("HEY, DON'T DO THAT");
-                //console.log("THIS SHOULD BE WORKING");
-                //myButton.innerHTML='RUN GAME';
                 $('#runButton').text("RUN GAME");
                 setRunButton = true;
                 if (slinkerX.length > highSscore) {
                     highSscore = slinkerX.length;
                     $('#high').html(highSscore);
                 }
-                //console.log("before");
-                //console.log(myButton);
-                //    myButton.disabled = false;
                 myButton.removeAttribute("disabled", "disabled");
-                // $('#runButton').prop('disabled', true);
-                //console.log("after");
-        //        console.log(myButton);
-        //        var atts = myButton.attributes;
-        //        console.log(atts);
-                //$('#runButton').prop('disabled', false);
                 clearInterval(loop);
             } else {
                 setRunButton = false;
                 gamestate = "playing";
                 myButton.innerText='Playing Game';
                 myButton.disabled = true;
-                //console.log(myButton);
-
-                //$('#runButton').prop('disabled', true);
-
-                //$('#runButton').text("Playing Game").attr("disabled","disabled");
-
-
                 $('#collide').html("");
-                //console.log("no ouchies")
             }
 
         };
@@ -493,7 +471,7 @@
             var offset = slink_block_size / 2; // this offset shifts the gridline from edge to center of a block
             // vertical grid line
             if (slinkerX[0] === goodFoodX[0]) {     //if slinker head equals x coordinate of goodFood, change
-                                                    //color of line to show slinker on same coord as goodFood
+                                                    //color of line to show slinker on same axis as goodFood
                 //console.log("slinkerX = " + slinkerX[0]);
                 //console.log("goodFoodX = " + goodFoodX[0]);
                 //console.log("w = " + w);
@@ -520,7 +498,7 @@
 
             // horizontal grid line
             if (slinkerY[0] === goodFoodY[0]) {     //if slinker head equals y coordinate of goodFood, change
-                //color of line to show slinker on same coord as goodFood
+                //color of line to show slinker on same axis as goodFood
 
                 //console.log("slinkerY = " + slinkerY[0]);
                 //console.log("goodFoodY = " + goodFoodY[0]);
@@ -551,7 +529,9 @@
             var testY = slinkerY[0];
             for (var i = 0; i < badFoodCount; i++) {
                 if (testX === goodFoodX[i] && testY === goodFoodY[i]) {
+                    console.log('matched, slinker ate a good food. about to makeGoodFood()');
                     makeGoodFood();
+
                     return;
                     // by returning here we don't remove or "pop" the last block off slinker, therefore slinker
                     // will grow by one block
@@ -567,11 +547,8 @@
                     return;
                 }
             }
-
-
             slinkerX.pop();
             slinkerY.pop();
-
         };
 
 
@@ -613,21 +590,11 @@
             // check for collision of head of slinker with food item
             checkBadCollide();
 
-            // testing code, adds a block to the end of slinker every 10 intervals
-            /*
-            if (!(counter % 10 === 0)) {
-                slinkerX.pop();
-                slinkerY.pop();
-            }
-            */
-
             // puts updated x/y coordinates on "front" of array
             slinkerX.unshift(headX);
             slinkerY.unshift(headY);
 
-
             checkWallCollide();
-
 
             // this code builds and draws slinker with a black colored head
             colorWhite = true;
@@ -635,7 +602,6 @@
                 //console.log("i = " + i + " slinkerX[i] = " + slinkerX[i] + " slinkerY[i] = " + slinkerY[i] + " colorWhite = " + colorWhite);
                 buildBlock(slinkerX[i], slinkerY[i]);
             }
-
 
             // shows how many blocks the slinker is getting
             if (!setRunButton) {
@@ -646,16 +612,11 @@
                 }
             }
 
-            /*
-            console.log("counter =  " + counter);
-            if (counter > 25) {
-                clearInterval(loop);
-            }
-            */
+            /*if (!(counter % 25 === 0)) {
+                console.log("counter =  " + counter);
+            }*/
 
         };
-
-
 
         // this sets up everything and kicks off the loop setInterval which causes the moveSlinker method
         // to execute every 180 milliseconds (.18 seconds)
@@ -680,7 +641,6 @@
                 gamestate = "playing";
                 console.log("set gamestate to playing at bottom of mainloop");
 
-
                 $('#runButton').text("Playing Game").attr("disabled","disabled");
 
                 if (slinkerX.length > highSscore) {
@@ -688,16 +648,15 @@
                     $('#high').html(highSscore);
                 }
 
-                loop = setInterval(moveSlinker, 180);
-
+                loop = setInterval(moveSlinker, speed);
+                console.log("loop = " + loop);
             } else {
                 console.log("set gamestate to game over at bottom of mainloop");
+                console.log("loop = " + loop);
 
                 $('#runButton').removeAttr('disabled');
 
-                //                  clearInterval(loop);
                 gamestate = "game over";
-                //                  return;
             }
 
         };
@@ -714,11 +673,11 @@
     // this IIFE (immediately invoked function expression) function runs once when first parsed by Javascript compiler
     // and kicks off the run game drawModule, as well as hooking up the myButton event listener, as well as creating
     // the new scope (everything within drawModule is hidden from the outside world except what is returned).
-    (function (drawModule) {
+    (function () { // this works as anonymous or named function (drawModule)... ???
 
         myButton.addEventListener("click", function () { drawModule.mainLoop();  });
 
-    }) (drawModule);
+    }) ();
 
 </script>
 

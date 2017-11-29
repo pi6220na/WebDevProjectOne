@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+
+
+<script>
+
+            var testObject = [1,2,3,4,5,6,7,8,9];
+
+
+            var mySet = new Set(testObject);
+
+            for (item in mySet) {
+                console.log("iterating mySet " + item);
+
+            }
+            console.log([mySet]);
+
+            var mySet2 = new Set([{x:6,y:5},{x:7,y:8},{x:1,y:4}]);
+            for (item in mySet2) {
+                console.log("iterating mySet2 " + item);
+
+            }
+
+            console.log([mySet2]);
+
+            mySet2.add({x:3,y:4});
+
+            console.log([mySet2]);
+
+
+            myArray = Array.from(mySet2);
+
+            console.log(myArray);
+
+            myArray.sort();
+
+            console.log(myArray);
+            console.log("first element x = " + myArray[0]['x']);
+            console.log("first element y = " + myArray[0]['y']);
+
+
+
+</script>
+
+
+
+</body>
+</html>

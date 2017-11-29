@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+
+    var grid = { x:1, y:2 };
+
+    console.log('grid = ' + grid.x + ' ' + grid.y);
+
+    var myGridArray = [];
+    var myOtherArray = [];
+
+    for (var i = 0; i < 10; i++) {
+
+        grid = { x:i, y:i };
+        myGridArray[i] = grid;
+        grid = { x:i, y:i };
+        myOtherArray[i] = grid;
+    }
+
+    console.log(myGridArray);
+
+    for (i = 0; i < 10; i++) {
+
+        console.log('myGridArray[i] i = ' + i + ' ' + myGridArray[i].x + ' ' + myGridArray[i].y);
+        console.log('myOtherArray[i] i = ' + i + ' ' + myOtherArray[i].x + ' ' + myOtherArray[i].y);
+        console.log('i = ' + i + ' compare = ' + (myGridArray[i].x === myOtherArray[i].x));
+    }
+
+    for (i = 0; i < 10; i++) {
+
+        myGridArray[i].x = i+2; myGridArray[i].y = i+3;
+        console.log('myGridArray[i] i = ' + i + ' ' + myGridArray[i].x + ' ' + myGridArray[i].y);
+        console.log('myOtherArray[i] i = ' + i + ' ' + myOtherArray[i].x + ' ' + myOtherArray[i].y);
+
+        console.log('i = ' + i + ' compare = ' + (myGridArray[i] === myOtherArray[i]));
+
+    }
+
+
+</script>
+
+
+
+</body>
+</html>
