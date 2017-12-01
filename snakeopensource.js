@@ -35,6 +35,7 @@ window.onload = function() {
     // Images
     var images = [];
     var tileimage;
+    var wallimage;
 
     // Image loading global variables
     var loadcount = 0;
@@ -110,7 +111,7 @@ window.onload = function() {
 
     // Snake
     var Snake = function() {
-        this.init(0, 0, 1, 10, 1);
+        this.init(0, 0, 1, 5, 1);  // 5 was 10
     }
 
     // Direction table: Up, Right, Down, Left
@@ -189,7 +190,8 @@ window.onload = function() {
 
     // Create objects
     var snake = new Snake();
-    var level = new Level(20, 15, 32, 32);
+    // var level = new Level(20, 15, 32, 32);  //original
+    var level = new Level(48, 36, 16, 16);
 
     // Variables
     var score = 0;              // Score
@@ -202,6 +204,11 @@ window.onload = function() {
         // Load images
         images = loadImages(["snake-graphics.png"]);
         tileimage = images[0];
+        //for (item in tileimage) {
+        //    console.log('tileimage = ' + tileimage[item]);
+        //}
+        //var wimage=loadImages(["wall_top1.png"]);
+        //wallimage = wimage[0];
 
         // Add mouse events
         canvas.addEventListener("mousedown", onMouseDown);
@@ -227,7 +234,7 @@ window.onload = function() {
 
     function newGame() {
         // Initialize the snake
-        snake.init(10, 10, 1, 10, 4);
+        snake.init(10, 10, 1, 10, 4);  // 5 was 10
 
         // Generate the default level
         level.generate();
@@ -439,6 +446,12 @@ window.onload = function() {
                     // Wall
                     context.fillStyle = "#bcae76";
                     context.fillRect(tilex, tiley, level.tilewidth, level.tileheight);
+                    var tx = 0;
+                    var ty = 2;
+                    var tilew = 64;
+                    var tileh = 64;
+                    //context.drawImage(wallimage, tx*tilew, ty*tileh, tilew, tileh, tilex, tiley, level.tilewidth, level.tileheight);
+                    context.drawImage(tileimage,tx*tilew, ty*tileh, tilew, tileh, tilex, tiley, level.tilewidth, level.tileheight);
                 } else if (tile == 2) {
                     // Apple
 
